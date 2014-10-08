@@ -10,6 +10,7 @@ import UIKit
 
 class Tweet {
   
+  var id          : String
   var text        : String
   var image       : UIImage?
   var username    : String?
@@ -18,14 +19,30 @@ class Tweet {
   var profileString : String?
   var profileColorString : String?
   var profileColor : UIColor?
+  var favoriteCount : Int?
+  var retweetCount: Int?
   
+  var readableDate : String {
+    
+    let formatter = NSDateFormatter()
+//    formatter.dateFormat = "MM d h:mm a"
+    formatter.dateFormat = "h:mm a"
+    return formatter.stringFromDate(self.timestamp)
+      
+  }
+  
+  
+  let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
   let operationsQueue = NSOperationQueue()
   
   init (tweetDictionary : NSDictionary) {
     self.text = tweetDictionary["text"] as String
+    self.id = tweetDictionary["id_str"] as String
     let formatter = NSDateFormatter()
     formatter.dateFormat = "E MMM dd HH:mm:ssZ yyyy"
     self.timestamp = formatter.dateFromString(tweetDictionary["created_at"] as String)!
+    self.retweetCount = tweetDictionary["retweet_count"] as? Int
+    self.favoriteCount = tweetDictionary["favourites_count"] as? Int
     if let userDictionary = tweetDictionary["user"] as? NSDictionary {
       self.profileString = (userDictionary["profile_image_url"] as String)
       self.username = userDictionary["name"] as String?
@@ -35,15 +52,19 @@ class Tweet {
   
   func loadImages() {
     
+    let networkController = appDelegate.networkController
+    
     if image == nil{
-      let imageURL = NSURL(string: profileString!)
-      var error : NSError?
-      let imageData = NSData(contentsOfURL: imageURL, options: nil, error: &error)
-      self.image = UIImage(data: imageData)
+
+      let normalRange = profileString?.rangeOfString("_normal", options: nil, range: nil, locale: nil)
+      let newString = profileString?.stringByReplacingCharactersInRange(normalRange!, withString: "_bigger")
+
+      let imageURL = NSURL(string: newString!)
+      self.image = networkController.getImageFromURL(imageURL)
     }
     
     if profileColor == nil{
-      self.profileColor = self.getColorFromHex(profileColorString!)
+      self.profileColor = networkController.getColorFromHex(profileColorString!)
     }
     
   }
@@ -58,6 +79,7 @@ class Tweet {
         if let tweetDictionary = JSONDictionary as? NSDictionary {
           var newTweet = Tweet(tweetDictionary: tweetDictionary)
           tweets.append(newTweet)
+
         }
       }
       println("\(tweets.count) tweets created.")
@@ -66,25 +88,20 @@ class Tweet {
     return nil
   }
   
-  func getColorFromHex(hexString: String) -> UIColor {
+  func updateInfo(data: NSData){
     
-    let url = NSURL(string: "http://rgb.to/save/json/color/\(hexString)")
-    let data = NSData(contentsOfURL: url)
-    var error : NSError?
-    let json = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error) as NSDictionary
-    let rgb = json["rgb"] as [String:Int]
-    
-    let red = CGFloat(rgb["r"]!)/255
-    let green = CGFloat(rgb["g"]!)/255
-    let blue = CGFloat(rgb["b"]!)/255
-    
-    println(green)
-    
-    let myColor = UIColor(red: red, green: green, blue: blue, alpha: 1.0)
-    
-    println(myColor)
-    return myColor
-    
-    
-  }
+      var error : NSError?
+      if let tweetDictionary = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error) as? NSDictionary {
+        println("Success!")
+        self.favoriteCount = (tweetDictionary["favorite_count"] as Int)
+        self.retweetCount = (tweetDictionary["retweet_count"] as Int)
+        println(tweetDictionary)
+        println(self.retweetCount!)
+        println(self.favoriteCount!)
+
+      }
+
 }
+}
+
+    

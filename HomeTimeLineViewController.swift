@@ -7,45 +7,67 @@
 //
 
 import UIKit
-import Accounts
-import Social
 
 class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
   var tweets : [Tweet]?
-  var twitterAccount : ACAccount?
   var operationsQueue = NSOperationQueue()
-  var myLoadView : UIView!
+  var networkController : NetworkController!
+
   @IBOutlet weak var tableView: UITableView!
   @IBOutlet weak var spinningWheel: UIActivityIndicatorView!
   
   // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
+    self.networkController = appDelegate.networkController
+    
     self.tableView.alpha = 0.0
-    
-    
     self.tableView.rowHeight = UITableViewAutomaticDimension
     self.tableView.estimatedRowHeight = 150.0
     
-    
-    
-  }
-  
-  override func viewWillAppear(animated: Bool) {
-    super.viewWillAppear(animated)
-    
-    myLoadView = UIView(frame: self.view.frame)
-    myLoadView.backgroundColor = UIColor.orangeColor()
-    
-//    self.navigationController!.view.addSubview(myLoadView)
-//    self.navigationController!.navigationBar.hidden = true
-    
+    self.networkController.fetchHomeTimeline { (errorDescription, tweets) -> Void in
+      if errorDescription != nil{
+        
+        NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+          let alert = UIAlertController(title: "Oops!", message: errorDescription, preferredStyle: UIAlertControllerStyle.Alert)
+          let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Cancel, handler: nil)
+          alert.addAction(ok)
+          self.presentViewController(alert, animated: true, completion: nil)
+        })
+      } else {
+        
+        self.tweets = tweets
+        
+        NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+          self.tableView.reloadData()
+          UIView.animateWithDuration(1.0, delay: 1.0, options: nil, animations: { () -> Void in
+            self.tableView.alpha = 1.0
+            self.spinningWheel.stopAnimating()
+            
+          }, completion: nil)
+          
+        })
+      }
+    }
   }
   
   override func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
     // Dispose of any resources that can be recreated.
+  }
+  
+  override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    let index = tableView.indexPathForSelectedRow()
+    
+    if segue.identifier == "Single" {
+      let destination = segue.destinationViewController as SingleTweetViewController
+      destination.tweet = tweets![index!.row]
+      
+    }
+    
   }
   
   
@@ -63,17 +85,9 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     
     let tweet = self.tweets![indexPath.row]
     
-    let text = tweet.text
-    let username = tweet.username
-    let timestamp = tweet.timestamp
-    
-    let formatter = NSDateFormatter()
-    formatter.dateFormat = "MMM d h:mm a"
-    cell.dateLabel.text = formatter.stringFromDate(timestamp)
-    
-    cell.tweetTextLabel.text = text
-    cell.usernameLabel.text = username!
-    
+    cell.tweetTextLabel.text = tweet.text
+    cell.usernameLabel.text = tweet.username!
+    cell.dateLabel.text = tweet.readableDate
     
     
     operationsQueue.addOperationWithBlock { () -> Void in
@@ -121,25 +135,6 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     let newImage = UIImage(data: imageData)
     
     return newImage
-    
-  }
-  
-  func getColorFromHex(hexString: String) -> UIColor {
-    
-    let url = NSURL(string: "http://rgb.to/save/json/color/\(hexString)")
-    
-    let data = NSData(contentsOfURL: url)
-    
-    var error : NSError?
-    
-    let json = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error) as NSDictionary
-    
-    let rgb = json["rgb"] as [String:Int]
-    
-    println(CGFloat(rgb["r"]!))
-    
-    return UIColor(red: CGFloat(rgb["r"]!), green: CGFloat(rgb["g"]!), blue: CGFloat(rgb["b"]!), alpha: 1.0)
-    
     
   }
   
