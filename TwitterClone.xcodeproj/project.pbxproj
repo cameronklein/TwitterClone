@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E399AFB19E5B4BA00C967CA /* NetworkController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E399AFA19E5B4BA00C967CA /* NetworkController.swift */; };
 		7E5D4E4819E30983007E0E88 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D4E4719E30983007E0E88 /* AppDelegate.swift */; };
 		7E5D4E4B19E30983007E0E88 /* TwitterClone.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7E5D4E4919E30983007E0E88 /* TwitterClone.xcdatamodeld */; };
 		7E5D4E5019E30983007E0E88 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E5D4E4E19E30983007E0E88 /* Main.storyboard */; };
@@ -31,6 +32,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7E399AFA19E5B4BA00C967CA /* NetworkController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkController.swift; sourceTree = "<group>"; };
 		7E5D4E4219E30983007E0E88 /* TwitterClone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TwitterClone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E5D4E4619E30983007E0E88 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E5D4E4719E30983007E0E88 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				7E5D4E6D19E309EC007E0E88 /* HomeTimeLineViewController.swift */,
+				7E399AFA19E5B4BA00C967CA /* NetworkController.swift */,
 			);
 			name = "Controller Layer";
 			sourceTree = "<group>";
@@ -255,6 +258,7 @@
 			files = (
 				7E5D4E4819E30983007E0E88 /* AppDelegate.swift in Sources */,
 				7E5D4E4B19E30983007E0E88 /* TwitterClone.xcdatamodeld in Sources */,
+				7E399AFB19E5B4BA00C967CA /* NetworkController.swift in Sources */,
 				7E5D4E6E19E309EC007E0E88 /* HomeTimeLineViewController.swift in Sources */,
 				7E5D4E7019E3135F007E0E88 /* Tweet.swift in Sources */,
 				7E5D4E7619E33F00007E0E88 /* TimeLineTweetCell.swift in Sources */,
@@ -451,6 +455,7 @@
 				7E5D4E6619E30983007E0E88 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7E5D4E6719E30983007E0E88 /* Build configuration list for PBXNativeTarget "TwitterCloneTests" */ = {
 			isa = XCConfigurationList;
@@ -459,6 +464,7 @@
 				7E5D4E6919E30983007E0E88 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
