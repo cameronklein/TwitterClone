@@ -18,7 +18,8 @@ class NetworkController {
   init () {
   }
   
-  func fetchHomeTimeline(completionHandler : (errorDescription: String?, tweets: [Tweet]?) -> (Void)) {
+  
+  func fetchTweets(forUser handle: String = " ", completionHandler : (errorDescription: String?, tweets: [Tweet]?) -> (Void)) {
     
     let accountStore = ACAccountStore()
     let accountType = accountStore.accountTypeWithAccountTypeIdentifier(ACAccountTypeIdentifierTwitter)
@@ -28,8 +29,21 @@ class NetworkController {
         
         let accounts = accountStore.accountsWithAccountType(accountType)
         self.twitterAccount = (accounts.first as ACAccount)
-        let url = NSURL(string: "https://api.twitter.com/1.1/statuses/home_timeline.json")
-        let twitterRequest = SLRequest(forServiceType: SLServiceTypeTwitter, requestMethod: SLRequestMethod.GET, URL: url, parameters: ["count":"60"])
+        
+        var twitterRequest : SLRequest!
+        
+        if handle != " " {
+          let url = NSURL(string: "https://api.twitter.com/1.1/statuses/user_timeline.json")
+          twitterRequest = SLRequest(forServiceType: SLServiceTypeTwitter, requestMethod: SLRequestMethod.GET, URL: url, parameters: ["screen_name": handle])
+          
+          
+          } else {
+          
+            let url = NSURL(string: "https://api.twitter.com/1.1/statuses/home_timeline.json")
+            twitterRequest = SLRequest(forServiceType: SLServiceTypeTwitter, requestMethod: SLRequestMethod.GET, URL: url, parameters: ["count":"20"])
+          
+          }
+        
         twitterRequest.account = self.twitterAccount
         
         twitterRequest.performRequestWithHandler({ (data, httpResponse, error) -> Void in
@@ -43,14 +57,17 @@ class NetworkController {
               self.tweets = Tweet.parseJSONDataIntoTweets(data)!
               
               completionHandler(errorDescription: nil, tweets: self.tweets)
- 
+              println("Worked Just Fine!")
+              
             case 400...499:
               
               completionHandler(errorDescription: "An error occured on your end.", tweets: nil)
+              println("An error occured on your end.")
               
             case 500...599:
               
-             completionHandler(errorDescription: "An error occured on Twitter's end.", tweets: nil)
+              completionHandler(errorDescription: "An error occured on Twitter's end.", tweets: nil)
+              println("An error occured on Twitter's end.")
               
             default:
               println("Something bad happened: \(error.description)")
@@ -63,47 +80,38 @@ class NetworkController {
     }
   }
   
-  func updateTweet(tweet: Tweet, completionHandler : (errorDescription: String?, data: NSData?) -> (Void)){
-    let id = tweet.id
-    let accountStore = ACAccountStore()
-    let accountType = accountStore.accountTypeWithAccountTypeIdentifier(ACAccountTypeIdentifierTwitter)
-    var thisData : NSData? = nil
+  func fetchImagesForTweet(tweet: Tweet, completionHandler : (errorDescription: String?, images: (UIImage?, UIImage?)) -> (Void)) {
     
-    accountStore.requestAccessToAccountsWithType(accountType, options: nil) { (granted: Bool, error) -> Void in
-      if granted {
-        
-        let accounts = accountStore.accountsWithAccountType(accountType)
-        self.twitterAccount = (accounts.first as ACAccount)
-        let url = NSURL(string: "https://api.twitter.com/1.1/statuses/show.json")
-        let twitterRequest = SLRequest(forServiceType: SLServiceTypeTwitter, requestMethod: SLRequestMethod.GET, URL: url, parameters: ["id":id])
-        twitterRequest.account = self.twitterAccount
-        
-        twitterRequest.performRequestWithHandler({ (data, httpResponse, error) -> Void in
-          
-          if error == nil {
-            println("Single Tweet Called!")
-            println(httpResponse.statusCode)
-            
-            switch httpResponse.statusCode {
-              
-            case 200...299:
-              
-              completionHandler(errorDescription: nil, data: data)
-              
-            case 400...499:
-              println("Oops")
-            case 500...599:
-              println("Oops")
-            default:
-              println("Something bad happened: \(error.description)")
-            }
-          } else {
-            println(error.description)
-          }
-        })
-      }
+    var avatarImage : UIImage?
+    var bannerImage : UIImage?
+    let bannerString = tweet.bannerString!
+    let profileString = tweet.profileString!
+    
+    if tweet.image == nil {
+      let normalRange = profileString.rangeOfString("_normal", options: nil, range: nil, locale: nil)
+      let newString = profileString.stringByReplacingCharactersInRange(normalRange!, withString: "_bigger")
+      
+      let imageURL = NSURL(string: newString)
+      
+      let data = NSData(contentsOfURL: imageURL)
+      
+      avatarImage = UIImage(data: data)
     }
+    
+    if tweet.bannerImage == nil {
+      
+      let imageURL = NSURL(string: bannerString)
+      
+      let data = NSData(contentsOfURL: imageURL)
+      
+      bannerImage = UIImage(data: data)
+      
+    }
+    
+    return completionHandler(errorDescription: nil, images: (avatarImage, bannerImage))
+    
   }
+
   
   func getColorFromHex(hexString: String) -> UIColor {
     

@@ -10,17 +10,20 @@ import UIKit
 
 class Tweet {
   
-  var id          : String
-  var text        : String
-  var image       : UIImage?
-  var username    : String?
-  var timestamp   : NSDate
-  var background  : UIImage?
-  var profileString : String?
-  var profileColorString : String?
-  var profileColor : UIColor?
-  var favoriteCount : Int?
-  var retweetCount: Int?
+  var id                  : String
+  var text                : String
+  var image               : UIImage?
+  var username            : String?
+  var timestamp           : NSDate
+  var background          : UIImage?
+  var profileString       : String?
+  var profileColorString  : String?
+  var profileColor        : UIColor?
+  var favoriteCount       : Int?
+  var retweetCount        : Int?
+  var bannerString        : String?
+  var bannerImage         : UIImage?
+  var handle              : String?
   
   var readableDate : String {
     
@@ -42,31 +45,14 @@ class Tweet {
     formatter.dateFormat = "E MMM dd HH:mm:ssZ yyyy"
     self.timestamp = formatter.dateFromString(tweetDictionary["created_at"] as String)!
     self.retweetCount = tweetDictionary["retweet_count"] as? Int
-    self.favoriteCount = tweetDictionary["favourites_count"] as? Int
+    self.favoriteCount = tweetDictionary["favorite_count"] as? Int
     if let userDictionary = tweetDictionary["user"] as? NSDictionary {
       self.profileString = (userDictionary["profile_image_url"] as String)
       self.username = userDictionary["name"] as String?
       self.profileColorString = userDictionary["profile_sidebar_fill_color"] as String?
+      self.bannerString = userDictionary["profile_banner_url"] as String?
+      self.handle = userDictionary["screen_name"] as String?
     }
-  }
-  
-  func loadImages() {
-    
-    let networkController = appDelegate.networkController
-    
-    if image == nil{
-
-      let normalRange = profileString?.rangeOfString("_normal", options: nil, range: nil, locale: nil)
-      let newString = profileString?.stringByReplacingCharactersInRange(normalRange!, withString: "_bigger")
-
-      let imageURL = NSURL(string: newString!)
-      self.image = networkController.getImageFromURL(imageURL)
-    }
-    
-    if profileColor == nil{
-      self.profileColor = networkController.getColorFromHex(profileColorString!)
-    }
-    
   }
  
   class func parseJSONDataIntoTweets(rawJSONData : NSData) -> [Tweet]? {
@@ -87,21 +73,8 @@ class Tweet {
     }
     return nil
   }
-  
-  func updateInfo(data: NSData){
-    
-      var error : NSError?
-      if let tweetDictionary = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error) as? NSDictionary {
-        println("Success!")
-        self.favoriteCount = (tweetDictionary["favorite_count"] as Int)
-        self.retweetCount = (tweetDictionary["retweet_count"] as Int)
-        println(tweetDictionary)
-        println(self.retweetCount!)
-        println(self.favoriteCount!)
-
-      }
 
 }
-}
+
 
     

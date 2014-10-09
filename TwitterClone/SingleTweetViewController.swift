@@ -22,67 +22,98 @@ class SingleTweetViewController: UIViewController {
   
   var networkController : NetworkController!
   let operationQueue = NSOperationQueue()
+  let labelBackgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.8)
   
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    topBar.backgroundColor  = tweet.profileColor
-    profileImage.image      = tweet.image
-    profileLabel.text       = tweet.username
-    dateLabel.text          = tweet.readableDate
-    tweetLabel.text         = tweet.text
-
-    
     let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
     self.networkController = appDelegate.networkController
-  
+    
+    if tweet.image == nil || tweet.bannerImage == nil {
+      networkController.fetchImagesForTweet(tweet, completionHandler: { (errorDescription, images) -> (Void) in
+        if self.tweet.image == nil {
+          self.tweet.image = images.0
+        }
+        
+        if self.tweet.bannerImage == nil{
+          self.tweet.bannerImage = images.1
+        }
+        
+      })
+    }
+    
+    topBar.image            = tweet.bannerImage
+    profileImage.image      = tweet.image
+    profileLabel.text       = " " + tweet.username! + " "
+    dateLabel.text          = tweet.readableDate
+    tweetLabel.text         = tweet.text
+    retweetLabel.text       = String(tweet.retweetCount!)
+    favoriteLabel.text      = String(tweet.favoriteCount!)
+    
+    let tapRecognizer = UITapGestureRecognizer(target: self, action: "tapCaptured:")
+    profileImage.addGestureRecognizer(tapRecognizer)
+    profileImage.userInteractionEnabled = true
+    
+    let otherTapRecognizer = UITapGestureRecognizer(target: self, action: "tapCaptured:")
+    profileLabel.addGestureRecognizer(otherTapRecognizer)
+    profileLabel.userInteractionEnabled = true
+    
+    
   }
   
   override func viewWillAppear(animated: Bool) {
     super.viewWillAppear(animated)
     
-    networkController.updateTweet(tweet, completionHandler: { (errorDescription, data) -> (Void) in
-      self.tweet.updateInfo(data!)
-      NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
-        self.retweetLabel.text  = String(self.tweet.retweetCount!)
-        self.favoriteLabel.text = String(self.tweet.favoriteCount!)
-      })
-      
-    })
-    
     profileImage.clipsToBounds = true
-    profileImage.layer.cornerRadius = profileImage.frame.size.width / 3.1
     
     profileImage.layer.borderColor = UIColor.blackColor().CGColor
     profileImage.layer.borderWidth = 2
-
+    
+    profileLabel.backgroundColor = labelBackgroundColor
+    profileLabel.layer.cornerRadius = 4
+    profileLabel.clipsToBounds = true
+    
+    dateLabel.backgroundColor = labelBackgroundColor
+    dateLabel.layer.cornerRadius = 4
+    dateLabel.clipsToBounds = true
+    
+    self.profileImage.layer.needsDisplayOnBoundsChange = true
+    let dateFrame = topBar.layer.frame
     
   }
+  
+  override func viewDidAppear(animated: Bool) {
+    
+  }
+  
+  func tapCaptured(sender: UILongPressGestureRecognizer){
+    if sender.state == UIGestureRecognizerState.Ended {
+      let userVC = self.storyboard?.instantiateViewControllerWithIdentifier("USER_TIMELINE") as UserTimeLineViewController
+      userVC.initialTweet = tweet
+      self.navigationController?.pushViewController(userVC, animated: true)
+    }
+  }
+  
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    profileImage.layer.cornerRadius = profileImage.frame.size.width / 2
+  }
+  
+//  override func viewDidLayoutSubviews() {
+//    
+//    let topFrame = self.topBar.frame
+//    
+//    UIView.animateWithDuration(1.0, delay: 0.0, options: nil, animations: { () -> Void in
+//      
+//      self.favoriteLabel.frame = topFrame
+//      
+//      }, completion: nil)
+//  }
 
   override func didReceiveMemoryWarning() {
       super.didReceiveMemoryWarning()
     
   }
-  
-  override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-    let destination = segue.destinationViewController as HomeTimeLineViewController
-    
-    if segue.identifier == "Single"{
-      let index = destination.tableView.indexPathForSelectedRow()
-      destination.tableView.deselectRowAtIndexPath(index!, animated: true)
-      destination.tableView.reloadData()
-      
-    }
-  }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue!, sender: AnyObject!) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
