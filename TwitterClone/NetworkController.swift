@@ -91,7 +91,6 @@ class NetworkController {
               completionHandler(errorDescription: nil, data: data)
               
             case 400...499:
-              
               println("Oops")
             case 500...599:
               println("Oops")

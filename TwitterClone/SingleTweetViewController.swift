@@ -31,45 +31,31 @@ class SingleTweetViewController: UIViewController {
     profileLabel.text       = tweet.username
     dateLabel.text          = tweet.readableDate
     tweetLabel.text         = tweet.text
-    
-    profileImage.clipsToBounds = true
-    profileImage.layer.cornerRadius = profileImage.frame.size.width / 2.0
-    
-    profileImage.layer.borderColor = UIColor.blackColor().CGColor
-    profileImage.layer.borderWidth = 2
+
     
     let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
     self.networkController = appDelegate.networkController
-    
-    networkController.updateTweet(tweet, completionHandler: { (errorDescription, data) -> (Void) in
-      self.tweet.updateInfo(data!)
-      NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
-        self.retweetLabel.text = String(self.tweet.retweetCount!)
-        self.favoriteLabel.text = String(self.tweet.favoriteCount!)
-      })
-    })
-    
-    
-
+  
   }
   
   override func viewWillAppear(animated: Bool) {
     super.viewWillAppear(animated)
-    operationQueue.addOperationWithBlock { () -> Void in
-      
-      
+    
+    networkController.updateTweet(tweet, completionHandler: { (errorDescription, data) -> (Void) in
+      self.tweet.updateInfo(data!)
       NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
-        if self.tweet.retweetCount != nil{
-          self.retweetLabel.text = String(self.tweet.retweetCount!)
-        }
-        
-        if self.tweet.favoriteCount != nil{
-          println("Trying to update!")
-          self.favoriteLabel.text = String(self.tweet.favoriteCount!)
-          
-        }
+        self.retweetLabel.text  = String(self.tweet.retweetCount!)
+        self.favoriteLabel.text = String(self.tweet.favoriteCount!)
       })
-    }
+      
+    })
+    
+    profileImage.clipsToBounds = true
+    profileImage.layer.cornerRadius = profileImage.frame.size.width / 3.1
+    
+    profileImage.layer.borderColor = UIColor.blackColor().CGColor
+    profileImage.layer.borderWidth = 2
+
     
   }
 
@@ -86,7 +72,7 @@ class SingleTweetViewController: UIViewController {
       destination.tableView.deselectRowAtIndexPath(index!, animated: true)
       destination.tableView.reloadData()
       
-  }
+    }
   }
 
     /*
