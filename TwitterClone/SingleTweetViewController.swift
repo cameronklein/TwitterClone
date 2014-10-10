@@ -43,6 +43,7 @@ class SingleTweetViewController: UIViewController {
       })
     }
     
+    topBar.backgroundColor  = UIColor.blueColor()
     topBar.image            = tweet.bannerImage
     profileImage.image      = tweet.image
     profileLabel.text       = " " + tweet.username! + " "
@@ -58,7 +59,6 @@ class SingleTweetViewController: UIViewController {
     let otherTapRecognizer = UITapGestureRecognizer(target: self, action: "tapCaptured:")
     profileLabel.addGestureRecognizer(otherTapRecognizer)
     profileLabel.userInteractionEnabled = true
-    
     
   }
   

@@ -21,7 +21,7 @@ class Tweet {
   var profileColor        : UIColor?
   var favoriteCount       : Int?
   var retweetCount        : Int?
-  var bannerString        : String?
+  var bannerString        : String?  = "http://img4.wikia.nocookie.net/__cb20140603164657/p__/protagonist/images/b/b0/Blue-energy.jpg"
   var bannerImage         : UIImage?
   var handle              : String?
   
@@ -30,6 +30,7 @@ class Tweet {
     let formatter = NSDateFormatter()
 //    formatter.dateFormat = "MM d h:mm a"
     formatter.dateFormat = "h:mm a"
+    
     return formatter.stringFromDate(self.timestamp)
       
   }
@@ -50,8 +51,11 @@ class Tweet {
       self.profileString = (userDictionary["profile_image_url"] as String)
       self.username = userDictionary["name"] as String?
       self.profileColorString = userDictionary["profile_sidebar_fill_color"] as String?
-      self.bannerString = userDictionary["profile_banner_url"] as String?
       self.handle = userDictionary["screen_name"] as String?
+      
+      if let bannerURL = userDictionary["profile_banner_url"] as? String{
+        self.bannerString = bannerURL
+      }
     }
   }
  

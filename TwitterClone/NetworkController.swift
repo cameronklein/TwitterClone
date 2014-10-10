@@ -19,7 +19,7 @@ class NetworkController {
   }
   
   
-  func fetchTweets(forUser handle: String = " ", completionHandler : (errorDescription: String?, tweets: [Tweet]?) -> (Void)) {
+  func fetchTweets(forUser handle: String? = nil, sinceID : String? = nil, maxID : String? = nil, completionHandler : (errorDescription: String?, tweets: [Tweet]?) -> (Void)) {
     
     let accountStore = ACAccountStore()
     let accountType = accountStore.accountTypeWithAccountTypeIdentifier(ACAccountTypeIdentifierTwitter)
@@ -32,18 +32,28 @@ class NetworkController {
         
         var twitterRequest : SLRequest!
         
-        if handle != " " {
-          let url = NSURL(string: "https://api.twitter.com/1.1/statuses/user_timeline.json")
-          twitterRequest = SLRequest(forServiceType: SLServiceTypeTwitter, requestMethod: SLRequestMethod.GET, URL: url, parameters: ["screen_name": handle])
-          
-          
-          } else {
-          
-            let url = NSURL(string: "https://api.twitter.com/1.1/statuses/home_timeline.json")
-            twitterRequest = SLRequest(forServiceType: SLServiceTypeTwitter, requestMethod: SLRequestMethod.GET, URL: url, parameters: ["count":"20"])
-          
-          }
+        var paramDictionary = [NSObject : AnyObject]()
+        var url : NSURL!
         
+        paramDictionary["count"] = 50
+        if let screenname = handle{
+          paramDictionary["screen_name"] = screenname
+          url = NSURL(string: "https://api.twitter.com/1.1/statuses/user_timeline.json")
+        } else {
+          url = NSURL(string: "https://api.twitter.com/1.1/statuses/home_timeline.json")
+        }
+        if let thisSinceID = sinceID{
+          paramDictionary["since_id"] = thisSinceID
+        }
+        if let thisMaxID = maxID{
+          paramDictionary["max_id"] = thisMaxID
+          println("Request sent with max ID: \(thisMaxID)")
+        }
+        
+        
+        twitterRequest = SLRequest(forServiceType: SLServiceTypeTwitter, requestMethod: SLRequestMethod.GET, URL: url, parameters: paramDictionary)
+        
+
         twitterRequest.account = self.twitterAccount
         
         twitterRequest.performRequestWithHandler({ (data, httpResponse, error) -> Void in
@@ -81,13 +91,14 @@ class NetworkController {
   }
   
   func fetchImagesForTweet(tweet: Tweet, completionHandler : (errorDescription: String?, images: (UIImage?, UIImage?)) -> (Void)) {
-    
+    println("Called!")
     var avatarImage : UIImage?
     var bannerImage : UIImage?
     let bannerString = tweet.bannerString!
     let profileString = tweet.profileString!
     
     if tweet.image == nil {
+      
       let normalRange = profileString.rangeOfString("_normal", options: nil, range: nil, locale: nil)
       let newString = profileString.stringByReplacingCharactersInRange(normalRange!, withString: "_bigger")
       
@@ -106,31 +117,17 @@ class NetworkController {
       
       bannerImage = UIImage(data: data)
       
+      if bannerImage == nil {
+        let backupURL = NSURL(string: "http://img4.wikia.nocookie.net/__cb20140603164657/p__/protagonist/images/b/b0/Blue-energy.jpg")
+        let backupData = NSData(contentsOfURL: backupURL)
+        
+        bannerImage = UIImage(data: backupData)
+      }
+      
     }
     
     return completionHandler(errorDescription: nil, images: (avatarImage, bannerImage))
     
   }
-
   
-  func getColorFromHex(hexString: String) -> UIColor {
-    
-    let url = NSURL(string: "http://rgb.to/save/json/color/\(hexString)")
-    let data = NSData(contentsOfURL: url)
-    var error : NSError?
-    let json = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error) as NSDictionary
-    let rgb = json["rgb"] as [String:Int]
-    
-    let red = CGFloat(rgb["r"]!)/255
-    let green = CGFloat(rgb["g"]!)/255
-    let blue = CGFloat(rgb["b"]!)/255
-    
-    return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
-    
-  }
-  
-  func getImageFromURL(url : NSURL) -> UIImage{
-    let data = NSData(contentsOfURL: url)
-    return UIImage(data: data)
-  }
 }

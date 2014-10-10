@@ -12,23 +12,31 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
 
   var tweets : [Tweet]?
   var operationsQueue = NSOperationQueue()
+  var imageQueue = NSOperationQueue()
   var networkController : NetworkController!
   var lastIndexPath : NSIndexPath?
-  
-  let labelBackgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.8)
+  var appDelegate : AppDelegate!
 
   @IBOutlet weak var tableView: UITableView!
   @IBOutlet weak var spinningWheel: UIActivityIndicatorView!
+  
+  
   
   // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    
+    var footer = UIView()
+    
+    imageQueue.maxConcurrentOperationCount = 6
+    imageQueue.qualityOfService = NSQualityOfService.UserInteractive
+    
     //Register tableView cell
     self.tableView.registerNib(UINib(nibName: "TimeLineTweetCell", bundle: NSBundle.mainBundle()), forCellReuseIdentifier: "TWEET_CELL")
     
     // Get NetworkController
-    let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
+    appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
     self.networkController = appDelegate.networkController
     
     // Set up auto sizing
@@ -52,6 +60,9 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
         NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
           self.tweets = tweets
           self.tableView.reloadData()
+          for tweet in tweets!{
+            println(tweet.id)
+          }
           UIView.animateWithDuration(1.0, delay: 0.5, options: nil, animations: { () -> Void in
             self.tableView.alpha = 1.0
             self.spinningWheel.alpha = 0.0
@@ -66,21 +77,23 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
   override func viewWillAppear(animated: Bool) {
     super.viewWillAppear(animated)
     if let indexPath = lastIndexPath{
-      tableView.deselectRowAtIndexPath(indexPath, animated: false)
+      self.tableView.deselectRowAtIndexPath(indexPath, animated: false)
     }
   }
   
   override func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
-    // Dispose of any resources that can be recreated.
   }
+  
   
   // MARK: - TableViewDataSource
   
   func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if let theseTweets = self.tweets {
+      println(theseTweets.count)
       return theseTweets.count
     }
+    println("None")
     return 0
   }
   
@@ -95,13 +108,15 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     cell.retweetLabel.text    = String(tweet.retweetCount!)
     cell.favoriteLabel.text   = String(tweet.favoriteCount!)
     
-    cell.usernameLabel.backgroundColor = labelBackgroundColor
-    cell.usernameLabel.layer.cornerRadius = 4
-    cell.usernameLabel.clipsToBounds = true
+    func setUpBackgroundForLabel(label: UILabel){
+      let labelBackgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.8)
+      label.backgroundColor = labelBackgroundColor
+      cell.usernameLabel.layer.cornerRadius = 4
+      cell.usernameLabel.clipsToBounds = true
+    }
     
-    cell.dateLabel.backgroundColor = labelBackgroundColor
-    cell.dateLabel.layer.cornerRadius = 4
-    cell.dateLabel.clipsToBounds = true
+    setUpBackgroundForLabel(cell.usernameLabel)
+    setUpBackgroundForLabel(cell.dateLabel)
     
     cell.profileImage.clipsToBounds = true
     cell.profileImage.layer.cornerRadius = cell.profileImage.frame.size.height / 2.0
@@ -109,7 +124,7 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     cell.profileImage.layer.borderColor = UIColor.blackColor().CGColor
     cell.profileImage.layer.borderWidth = 1
 
-    operationsQueue.addOperationWithBlock { () -> Void in
+    imageQueue.addOperationWithBlock { () -> Void in
       
       if tweet.image == nil || tweet.bannerImage == nil {
 
@@ -129,10 +144,10 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
         cell.profileImage.image = tweet.image
         cell.topBarImage.image = tweet.bannerImage
         
-        
-        
       })
     }
+    cell.profileImage.addNaturalOnTopEffect(maximumRelativeValue: 40.0)
+    
     return cell
   }
   
@@ -141,15 +156,88 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     return 150
   }
   
+  func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+    if indexPath.row > self.tweets!.count - 7 {
+      self.reloadFromBottom()
+    }
+  }
+
+  func tableView(tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
+    self.reloadFromBottom()
+  }
+  
   func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
     
     lastIndexPath = indexPath
-    
     let destination : SingleTweetViewController = self.storyboard?.instantiateViewControllerWithIdentifier("SINGLE_TWEET") as SingleTweetViewController
-    
     destination.tweet = self.tweets![indexPath.row]
     
-    self.navigationController?.pushViewController(destination, animated: true)
+    let thisCell : TimeLineTweetCell = self.tableView.cellForRowAtIndexPath(indexPath) as TimeLineTweetCell
+    self.navigationController!.pushViewController(destination, animated: true)
+    
+//    let destinationFrame = destination.view.frame
+//    
+//    
+//    
+//    let subViews = thisCell.contentView.subviews as [UIView]
+//    thisCell.contentView.frame = self.view.frame
+//    
+//    for view in subViews {
+//      let constraints = view.constraints()
+//      view.removeConstraints(constraints)
+//      
+//      let newCenter = view.convertPoint(view.center, toView: nil)
+//      
+//      appDelegate.window?.addSubview(view)
+//      view.center = newCenter
+//      
+//    }
+//    destination.view.layoutSubviews()
+//    
+//    
+//    
+//    
+//    let thisProfile = thisCell.profileImage
+//    let destProfile = destination.profileImage
+//    let originalFrame = destProfile.frame
+//    destProfile.frame = thisProfile.convertRect(thisProfile.frame, toView: nil)
+//    
+//    let thisBar = thisCell.topBarImage
+//    let destBar = destination.topBar
+//    let originalBarFrame = destBar.frame
+//    let barWindowRef = thisBar.convertRect(thisBar.frame, toView: nil)
+//    destBar.frame = appDelegate.window!.convertRect(barWindowRef, toView: destination.view)
+//    destBar.frame = barWindowRef
+//    destBar.frame.origin.y = destBar.frame.origin.y - self.navigationController!.navigationBar.frame.height
+//    
+//
+//    var constant = destination.view.frame.width / destBar.frame.width
+//    println(constant)
+//    destBar.transform = CGAffineTransformMakeScale(constant, constant)
+//    
+//    destBar.frame.origin.x = 0.0
+//    
+//    println(barWindowRef)
+//    println(destBar.frame)
+//    destination.view.layoutSubviews()
+//    
+//    
+//    UIView.animateWithDuration(1.0,
+//      delay: 0.0,
+////      usingSpringWithDamping: 0.0,
+////      initialSpringVelocity: 0.0,
+//      options: nil,
+//      animations: { () -> Void in
+//        
+//        destProfile.frame = originalFrame
+//        destBar.frame = originalBarFrame
+//      },
+//      completion: {success in
+//        
+//    })
+//    
+//    
+    
     
   }
   
@@ -161,16 +249,18 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     tableView.reloadData()
   }
   
-  func getRandomBackgroundWithWidth(x: Int, andHeight y: Int) -> UIImage{
-    
-    let imageString = "http://lorempixel.com/\(x)/\(y)/"
-    let imageURL = NSURL(string: imageString)
-    var error : NSError?
-    let imageData = NSData(contentsOfURL: imageURL, options: nil, error: &error)
-    let newImage = UIImage(data: imageData)
-    
-    return newImage
-    
+  func reloadFromBottom(){
+    println(tweets!.last!.id)
+    networkController.fetchTweets(forUser: nil, sinceID: nil, maxID: tweets!.last!.id) { (errorDescription, tweets) -> (Void) in
+      for tweet in tweets! {
+        self.tweets!.append(tweet)
+        println(tweet.id)
+      }
+      NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+        self.tableView.reloadData()
+        println("New tweets retrieved!")
+      })
+    }
   }
   
 }

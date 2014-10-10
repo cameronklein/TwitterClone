@@ -186,7 +186,7 @@
                         <rect key="frame" x="0.0" y="64" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bFV-94-RMl">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bFV-94-RMl">
                                 <rect key="frame" x="0.0" y="20" width="600" height="100"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="100" id="37Q-nE-cB1"/>
@@ -282,11 +282,11 @@
                                 <exclude reference="ZFQ-FE-aDs"/>
                                 <exclude reference="fb5-di-fL0"/>
                                 <exclude reference="eVq-7G-gc8"/>
-                                <exclude reference="lBm-y5-BJ8"/>
                                 <exclude reference="Ut0-CL-lwO"/>
                                 <exclude reference="eGB-Vr-Pwq"/>
                                 <exclude reference="wHs-kb-D0q"/>
                                 <exclude reference="gM9-eJ-q8I"/>
+                                <exclude reference="lBm-y5-BJ8"/>
                             </mask>
                         </variation>
                     </view>
