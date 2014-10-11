@@ -14,10 +14,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var window: UIWindow?
   let networkController = NetworkController()
+  var username : String? = nil
 
 
   func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-    // Override point for customization after application launch.
+    
+    networkController.fetchCurrentUser { (errorDescription, screenname) -> (Void) in
+      self.username = screenname
+    }
+    
+    
     return true
   }
 

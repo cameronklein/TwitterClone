@@ -17,6 +17,8 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
   @IBOutlet weak var bannerImage: UIImageView!
   @IBOutlet weak var profileImage: UIImageView!
   @IBOutlet weak var spinningWheel: UIActivityIndicatorView!
+  var refreshController : UIRefreshControl!
+  var isRefreshing = false
   
   let labelBackgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.8)
   var initialTweet : Tweet!
@@ -28,9 +30,21 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
+
     let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
     self.networkController = appDelegate.networkController
+    
+    var username : String? = nil
+    
+    
+    
+    
+    /* SETUP TABLEVIEW STUFF */
+    
+    refreshController = UIRefreshControl()
+    refreshController.attributedTitle = NSAttributedString(string: "Pull to Refresh")
+    refreshController.addTarget(self, action: "reloadFromTop", forControlEvents: UIControlEvents.ValueChanged)
+    tableView.addSubview(refreshController)
     
     self.tableView.alpha = 0.0
     
@@ -38,13 +52,25 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     self.tableView.estimatedRowHeight = 150.0
     
     self.tableView.registerNib(UINib(nibName: "TimeLineTweetCell", bundle: NSBundle.mainBundle()), forCellReuseIdentifier: "TWEET_CELL")
-    
-    self.handleLabel.text    = " @" + initialTweet.handle! + " "
-    self.usernameLabel.text  = " " + initialTweet.username!
-    self.bannerImage.image   = initialTweet.bannerImage
-    self.profileImage.image  = initialTweet.image
 
-    networkController.fetchTweets(forUser: initialTweet.handle!, completionHandler: { (errorDescription, tweets) -> (Void) in
+    var didSetUsername = false
+    
+    if initialTweet == nil {
+      
+      username = appDelegate.username!
+      didSetUsername = true
+      
+    } else {
+      username = initialTweet.handle!
+      self.profileImage.image  = self.initialTweet.image
+      self.bannerImage.image   = self.initialTweet.bannerImage
+      self.handleLabel.text    = " @" + self.initialTweet.handle! + " "
+      self.usernameLabel.text  = " " + self.initialTweet.username!
+      self.profileImage.layer.borderColor = UIColor.blackColor().CGColor
+      self.profileImage.layer.borderWidth = 2
+    }
+
+    networkController.fetchTweets(forUser: username!, completionHandler: { (errorDescription, tweets) -> (Void) in
       
       if errorDescription != nil{
         
@@ -55,10 +81,26 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
           self.presentViewController(alert, animated: true, completion: nil)
         })
       } else {
-      
+        if didSetUsername{
+          self.networkController.fetchImagesForTweet(tweets![0], completionHandler: { (errorDescription, images) -> (Void) in
+            NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+              self.profileImage.image  = images.0
+              self.bannerImage.image   = images.1
+              self.handleLabel.text    = " @" + tweets![0].handle! + " "
+              self.usernameLabel.text  = " " + tweets![0].username!
+              self.profileImage.layer.borderColor = UIColor.blackColor().CGColor
+              self.profileImage.layer.borderWidth = 2
+            })
+          })
+        }
+        
       NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
         self.tweets = tweets
+        
+        self.handleLabel.text    = " @" + tweets![0].handle! + " "
+        self.usernameLabel.text  = " " + tweets![0].username!
         self.tableView.reloadData()
+        
         UIView.animateWithDuration(1.0, delay: 0.0, options: nil, animations: { () -> Void in
           self.tableView.alpha = 1.0
           self.spinningWheel.alpha = 0.0
@@ -68,6 +110,8 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
       })
       }
     })
+    
+    
     
   }
 
@@ -80,8 +124,7 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     
     profileImage.clipsToBounds = true
     
-    profileImage.layer.borderColor = UIColor.blackColor().CGColor
-    profileImage.layer.borderWidth = 2
+    
     
     usernameLabel.backgroundColor = labelBackgroundColor
     usernameLabel.layer.cornerRadius = 4
@@ -142,6 +185,58 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     
     self.navigationController?.pushViewController(destination, animated: true)
     
+  }
+  
+  func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+    if indexPath.row == self.tweets!.count - 10 {
+      self.reloadFromBottom()
+    }
+  }
+  
+  // MARK - Helper Methods
+  
+  func reloadFromTop(){
+    if self.isRefreshing == false {
+      self.isRefreshing == true
+      networkController.fetchTweets(forUser: tweets!.first!.handle!, sinceID: tweets!.first!.id, maxID: nil, completionHandler: { (errorDescription, tweets) -> (Void) in
+        for tweet in tweets! {
+          self.tweets!.insert(tweet, atIndex: 0)
+        }
+        NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+          self.tableView.reloadData()
+          println("New tweets retrieved from top!")
+          self.isRefreshing = false
+          self.refreshController.endRefreshing()
+        })
+      })
+    }
+  }
+  
+  func reloadFromBottom(){
+    println("Reloading from bottom")
+    
+    if self.isRefreshing == false{
+      self.isRefreshing == true
+      networkController.fetchTweets(forUser: tweets!.first!.handle!, sinceID: nil, maxID: tweets!.last!.id) { (errorDescription, tweets) -> (Void) in
+        if errorDescription != nil{
+          NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+            let alert = UIAlertController(title: "Error \(errorDescription)", message: "Loading backup tweets from bundle instead.", preferredStyle: UIAlertControllerStyle.Alert)
+            let ok = UIAlertAction(title: "That's cool.", style: UIAlertActionStyle.Cancel, handler: nil)
+            alert.addAction(ok)
+            self.presentViewController(alert, animated: true, completion: nil)
+          })
+        } else {
+          for tweet in tweets! {
+            self.tweets!.append(tweet)
+          }
+          NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+            self.tableView.reloadData()
+            println("New tweets retrieved from bottom!")
+            self.isRefreshing = false
+          })
+        }
+      }
+    }
   }
   
 

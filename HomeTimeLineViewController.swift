@@ -28,7 +28,7 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     
     /* SETUP TABLEVIEW STUFF */
     
-    var refreshController = UIRefreshControl()
+    refreshController = UIRefreshControl()
     refreshController.attributedTitle = NSAttributedString(string: "Pull to Refresh")
     refreshController.addTarget(self, action: "reloadFromTop", forControlEvents: UIControlEvents.ValueChanged)
     tableView.addSubview(refreshController)
@@ -38,7 +38,6 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     self.tableView.alpha = 0.0
     self.tableView.rowHeight = UITableViewAutomaticDimension
     self.tableView.estimatedRowHeight = 150.0
-    
     
     /* GET DATA */
     
@@ -59,7 +58,6 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
           UIView.animateWithDuration(1.0, delay: 1.0, options: nil, animations: { () -> Void in
             self.tableView.alpha = 1.0
             self.spinningWheel.alpha = 0.0
-            
           }, completion: nil)
         })
       }
@@ -108,7 +106,7 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     cell.profileImage.layer.cornerRadius = cell.profileImage.frame.size.height / 2.0
     
     cell.profileImage.layer.borderColor = UIColor.blackColor().CGColor
-    cell.profileImage.layer.borderWidth = 1
+    cell.profileImage.layer.borderWidth = 2
 
     imageQueue.addOperationWithBlock { () -> Void in
       if tweet.image == nil || tweet.bannerImage == nil {
@@ -119,14 +117,12 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
           if tweet.bannerImage == nil{
             tweet.bannerImage = images.1
           }
-          
         })
       }
       
       NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
         cell.profileImage.image = tweet.image
         cell.topBarImage.image = tweet.bannerImage
-        
       })
     }
     
@@ -150,24 +146,9 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     let destination : SingleTweetViewController = self.storyboard?.instantiateViewControllerWithIdentifier("SINGLE_TWEET") as SingleTweetViewController
     destination.tweet = self.tweets![indexPath.row]
     self.navigationController!.pushViewController(destination, animated: true)
-    
-
-    
-    
   }
   
-
   // MARK: - Helper Methods
-
-  @IBAction func presentTweetController(sender: UIBarButtonItem) {
-    
-    let newVC = self.storyboard?.instantiateViewControllerWithIdentifier("COMPOSE") as ComposeTweetViewController
-
-    self.presentViewController(newVC, animated: true) { () -> Void in
-      println("Hello!")
-    }
-    tableView.reloadData()
-  }
   
   func reloadFromTop(){
     if self.isRefreshing == false {
@@ -180,6 +161,7 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
           self.tableView.reloadData()
           println("New tweets retrieved from top!")
           self.isRefreshing = false
+          self.refreshController.endRefreshing()
         })
       })
     }
@@ -193,8 +175,8 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     networkController.fetchTweets(forUser: nil, sinceID: nil, maxID: tweets!.last!.id) { (errorDescription, tweets) -> (Void) in
       if errorDescription != nil{
         NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
-          let alert = UIAlertController(title: "Error!", message: errorDescription, preferredStyle: UIAlertControllerStyle.Alert)
-          let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Cancel, handler: nil)
+          let alert = UIAlertController(title: "Error \(errorDescription)", message: "Loading backup tweets from bundle instead.", preferredStyle: UIAlertControllerStyle.Alert)
+          let ok = UIAlertAction(title: "That's cool.", style: UIAlertActionStyle.Cancel, handler: nil)
           alert.addAction(ok)
           self.presentViewController(alert, animated: true, completion: nil)
         })

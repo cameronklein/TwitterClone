@@ -9,10 +9,8 @@
 import UIKit
 
 class ComposeTweetViewController: UIViewController {
-
-
-  @IBOutlet weak var textField: UITextView!
   
+  @IBOutlet weak var textField: UITextView!
   var networkController : NetworkController!
   
   //MARK - Lifecycle Methods
@@ -41,12 +39,27 @@ class ComposeTweetViewController: UIViewController {
   
   @IBAction func post(sender: UIButton) {
     networkController.postTweet(textField.text, completionHandler: { (errorDescription, tweets) -> (Void) in
-      println("Tweet posted!")
+      
+      NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+        if errorDescription == nil {
+          self.textField.text = nil
+          let alert = UIAlertController(title: "Success!", message: "Tweet Posted!", preferredStyle: UIAlertControllerStyle.Alert)
+          let ok = UIAlertAction(title: "Great!", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+          })
+          alert.addAction(ok)
+          self.presentViewController(alert, animated: true, completion: nil)
+        } else {
+          let alert = UIAlertController(title: "Uh oh!", message: "Something went wrong. Try again?", preferredStyle: UIAlertControllerStyle.Alert)
+          let ok = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
+          alert.addAction(ok)
+          self.presentViewController(alert, animated: true, completion: nil)
+        }
+      })
     })
   }
+}
 
 
 
     
 
-}
