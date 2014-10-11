@@ -24,6 +24,8 @@ class SingleTweetViewController: UIViewController {
   let operationQueue = NSOperationQueue()
   let labelBackgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.8)
   
+  // MARK: - Lifecycle Methods
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -49,8 +51,8 @@ class SingleTweetViewController: UIViewController {
     profileLabel.text       = " " + tweet.username! + " "
     dateLabel.text          = tweet.readableDate
     tweetLabel.text         = tweet.text
-    retweetLabel.text       = String(tweet.retweetCount!)
-    favoriteLabel.text      = String(tweet.favoriteCount!)
+    retweetLabel.text       = String(tweet.retweetCount)
+    favoriteLabel.text      = String(tweet.favoriteCount)
     
     let tapRecognizer = UITapGestureRecognizer(target: self, action: "tapCaptured:")
     profileImage.addGestureRecognizer(tapRecognizer)
@@ -83,9 +85,16 @@ class SingleTweetViewController: UIViewController {
     
   }
   
-  override func viewDidAppear(animated: Bool) {
-    
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    profileImage.layer.cornerRadius = profileImage.frame.size.width / 2
   }
+  
+  override func didReceiveMemoryWarning() {
+    super.didReceiveMemoryWarning()
+  }
+  
+  // MARK: - Helper Methods
   
   func tapCaptured(sender: UILongPressGestureRecognizer){
     if sender.state == UIGestureRecognizerState.Ended {
@@ -94,26 +103,7 @@ class SingleTweetViewController: UIViewController {
       self.navigationController?.pushViewController(userVC, animated: true)
     }
   }
-  
-  override func viewDidLayoutSubviews() {
-    super.viewDidLayoutSubviews()
-    profileImage.layer.cornerRadius = profileImage.frame.size.width / 2
-  }
-  
-//  override func viewDidLayoutSubviews() {
-//    
-//    let topFrame = self.topBar.frame
-//    
-//    UIView.animateWithDuration(1.0, delay: 0.0, options: nil, animations: { () -> Void in
-//      
-//      self.favoriteLabel.frame = topFrame
-//      
-//      }, completion: nil)
-//  }
 
-  override func didReceiveMemoryWarning() {
-      super.didReceiveMemoryWarning()
-    
-  }
+
 
 }

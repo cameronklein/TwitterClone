@@ -14,41 +14,38 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
   var operationsQueue = NSOperationQueue()
   var imageQueue = NSOperationQueue()
   var networkController : NetworkController!
-  var lastIndexPath : NSIndexPath?
   var appDelegate : AppDelegate!
+  var isRefreshing = false
+  var refreshController : UIRefreshControl!
 
   @IBOutlet weak var tableView: UITableView!
   @IBOutlet weak var spinningWheel: UIActivityIndicatorView!
   
-  
-  
   // MARK: - Lifecycle
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    /* SETUP TABLEVIEW STUFF */
     
-    var footer = UIView()
+    var refreshController = UIRefreshControl()
+    refreshController.attributedTitle = NSAttributedString(string: "Pull to Refresh")
+    refreshController.addTarget(self, action: "reloadFromTop", forControlEvents: UIControlEvents.ValueChanged)
+    tableView.addSubview(refreshController)
     
-    imageQueue.maxConcurrentOperationCount = 6
-    imageQueue.qualityOfService = NSQualityOfService.UserInteractive
-    
-    //Register tableView cell
     self.tableView.registerNib(UINib(nibName: "TimeLineTweetCell", bundle: NSBundle.mainBundle()), forCellReuseIdentifier: "TWEET_CELL")
     
-    // Get NetworkController
-    appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
-    self.networkController = appDelegate.networkController
-    
-    // Set up auto sizing
     self.tableView.alpha = 0.0
-    
     self.tableView.rowHeight = UITableViewAutomaticDimension
     self.tableView.estimatedRowHeight = 150.0
     
-    // Fetch timeline and handle request
+    
+    /* GET DATA */
+    
+    appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
+    self.networkController = appDelegate.networkController
     self.networkController.fetchTweets (completionHandler: { (errorDescription, tweets) -> Void in
       if errorDescription != nil{
-        
         NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
           let alert = UIAlertController(title: "Oops!", message: errorDescription, preferredStyle: UIAlertControllerStyle.Alert)
           let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Cancel, handler: nil)
@@ -56,57 +53,46 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
           self.presentViewController(alert, animated: true, completion: nil)
         })
       } else {
-      
         NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
           self.tweets = tweets
           self.tableView.reloadData()
-          for tweet in tweets!{
-            println(tweet.id)
-          }
-          UIView.animateWithDuration(1.0, delay: 0.5, options: nil, animations: { () -> Void in
+          UIView.animateWithDuration(1.0, delay: 1.0, options: nil, animations: { () -> Void in
             self.tableView.alpha = 1.0
             self.spinningWheel.alpha = 0.0
             
           }, completion: nil)
-          
         })
       }
     })
   }
   
-  override func viewWillAppear(animated: Bool) {
-    super.viewWillAppear(animated)
-    if let indexPath = lastIndexPath{
-      self.tableView.deselectRowAtIndexPath(indexPath, animated: false)
-    }
-  }
-  
   override func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
+    networkController.cache.removeAll(keepCapacity: false)
+    println("Memory Warning!!!")
   }
   
-  
-  // MARK: - TableViewDataSource
+  // MARK: - UITableViewDataSource
   
   func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if let theseTweets = self.tweets {
-      println(theseTweets.count)
       return theseTweets.count
     }
-    println("None")
     return 0
   }
   
   func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCellWithIdentifier("TWEET_CELL", forIndexPath: indexPath) as TimeLineTweetCell
     
+    let cell = tableView.dequeueReusableCellWithIdentifier("TWEET_CELL", forIndexPath: indexPath) as TimeLineTweetCell
     let tweet = self.tweets![indexPath.row]
     
     cell.tweetTextLabel.text  = tweet.text
     cell.usernameLabel.text   = " " + tweet.username! + " "
     cell.dateLabel.text       = " " + tweet.readableDate + " "
-    cell.retweetLabel.text    = String(tweet.retweetCount!)
-    cell.favoriteLabel.text   = String(tweet.favoriteCount!)
+    cell.retweetLabel.text    = String(tweet.retweetCount)
+    cell.favoriteLabel.text   = String(tweet.favoriteCount)
+    
+    cell.selectionStyle = UITableViewCellSelectionStyle.None
     
     func setUpBackgroundForLabel(label: UILabel){
       let labelBackgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.8)
@@ -125,14 +111,11 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     cell.profileImage.layer.borderWidth = 1
 
     imageQueue.addOperationWithBlock { () -> Void in
-      
       if tweet.image == nil || tweet.bannerImage == nil {
-
         self.networkController.fetchImagesForTweet(tweet, completionHandler: { (errorDescription, images) -> (Void) in
           if tweet.image == nil {
             tweet.image = images.0
           }
-          
           if tweet.bannerImage == nil{
             tweet.bannerImage = images.1
           }
@@ -146,7 +129,6 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
         
       })
     }
-    cell.profileImage.addNaturalOnTopEffect(maximumRelativeValue: 40.0)
     
     return cell
   }
@@ -156,87 +138,20 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     return 150
   }
   
+  // MARK: - UITableViewDelegate
+  
   func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-    if indexPath.row > self.tweets!.count - 7 {
+    if indexPath.row == self.tweets!.count - 10 {
       self.reloadFromBottom()
     }
   }
-
-  func tableView(tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
-    self.reloadFromBottom()
-  }
   
   func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-    
-    lastIndexPath = indexPath
     let destination : SingleTweetViewController = self.storyboard?.instantiateViewControllerWithIdentifier("SINGLE_TWEET") as SingleTweetViewController
     destination.tweet = self.tweets![indexPath.row]
-    
-    let thisCell : TimeLineTweetCell = self.tableView.cellForRowAtIndexPath(indexPath) as TimeLineTweetCell
     self.navigationController!.pushViewController(destination, animated: true)
     
-//    let destinationFrame = destination.view.frame
-//    
-//    
-//    
-//    let subViews = thisCell.contentView.subviews as [UIView]
-//    thisCell.contentView.frame = self.view.frame
-//    
-//    for view in subViews {
-//      let constraints = view.constraints()
-//      view.removeConstraints(constraints)
-//      
-//      let newCenter = view.convertPoint(view.center, toView: nil)
-//      
-//      appDelegate.window?.addSubview(view)
-//      view.center = newCenter
-//      
-//    }
-//    destination.view.layoutSubviews()
-//    
-//    
-//    
-//    
-//    let thisProfile = thisCell.profileImage
-//    let destProfile = destination.profileImage
-//    let originalFrame = destProfile.frame
-//    destProfile.frame = thisProfile.convertRect(thisProfile.frame, toView: nil)
-//    
-//    let thisBar = thisCell.topBarImage
-//    let destBar = destination.topBar
-//    let originalBarFrame = destBar.frame
-//    let barWindowRef = thisBar.convertRect(thisBar.frame, toView: nil)
-//    destBar.frame = appDelegate.window!.convertRect(barWindowRef, toView: destination.view)
-//    destBar.frame = barWindowRef
-//    destBar.frame.origin.y = destBar.frame.origin.y - self.navigationController!.navigationBar.frame.height
-//    
-//
-//    var constant = destination.view.frame.width / destBar.frame.width
-//    println(constant)
-//    destBar.transform = CGAffineTransformMakeScale(constant, constant)
-//    
-//    destBar.frame.origin.x = 0.0
-//    
-//    println(barWindowRef)
-//    println(destBar.frame)
-//    destination.view.layoutSubviews()
-//    
-//    
-//    UIView.animateWithDuration(1.0,
-//      delay: 0.0,
-////      usingSpringWithDamping: 0.0,
-////      initialSpringVelocity: 0.0,
-//      options: nil,
-//      animations: { () -> Void in
-//        
-//        destProfile.frame = originalFrame
-//        destBar.frame = originalBarFrame
-//      },
-//      completion: {success in
-//        
-//    })
-//    
-//    
+
     
     
   }
@@ -244,23 +159,57 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
 
   // MARK: - Helper Methods
 
-  @IBAction func sort(sender: UIBarButtonItem) {
-    tweets?.sort { $0.text < $1.text }
+  @IBAction func presentTweetController(sender: UIBarButtonItem) {
+    
+    let newVC = self.storyboard?.instantiateViewControllerWithIdentifier("COMPOSE") as ComposeTweetViewController
+
+    self.presentViewController(newVC, animated: true) { () -> Void in
+      println("Hello!")
+    }
     tableView.reloadData()
   }
   
+  func reloadFromTop(){
+    if self.isRefreshing == false {
+      self.isRefreshing == true
+      networkController.fetchTweets(forUser: nil, sinceID: tweets!.first!.id, maxID: nil, completionHandler: { (errorDescription, tweets) -> (Void) in
+        for tweet in tweets! {
+          self.tweets!.insert(tweet, atIndex: 0)
+        }
+        NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+          self.tableView.reloadData()
+          println("New tweets retrieved from top!")
+          self.isRefreshing = false
+        })
+      })
+    }
+  }
+  
   func reloadFromBottom(){
-    println(tweets!.last!.id)
+    println("Reloading from bottom")
+
+    if self.isRefreshing == false{
+      self.isRefreshing == true
     networkController.fetchTweets(forUser: nil, sinceID: nil, maxID: tweets!.last!.id) { (errorDescription, tweets) -> (Void) in
+      if errorDescription != nil{
+        NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+          let alert = UIAlertController(title: "Error!", message: errorDescription, preferredStyle: UIAlertControllerStyle.Alert)
+          let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Cancel, handler: nil)
+          alert.addAction(ok)
+          self.presentViewController(alert, animated: true, completion: nil)
+        })
+      } else {
       for tweet in tweets! {
         self.tweets!.append(tweet)
-        println(tweet.id)
       }
       NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
         self.tableView.reloadData()
-        println("New tweets retrieved!")
+        println("New tweets retrieved from bottom!")
+        self.isRefreshing = false
       })
     }
+    }
+  }
   }
   
 }

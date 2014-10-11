@@ -57,10 +57,9 @@
                         </variation>
                     </view>
                     <navigationItem key="navigationItem" title="Home Time Line" id="DwQ-BA-04t">
-                        <barButtonItem key="rightBarButtonItem" title="Sort" style="done" id="dbK-bt-dDH">
-                            <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="compose" id="hZs-bF-6lm">
                             <connections>
-                                <action selector="sort:" destination="BYZ-38-t0r" id="bUz-fW-T8x"/>
+                                <action selector="presentTweetController:" destination="BYZ-38-t0r" id="fyj-Y9-f6e"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -172,7 +171,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PD3-1o-Ioi" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1137" y="953"/>
+            <point key="canvasLocation" x="1137" y="958"/>
         </scene>
         <!--Single Tweet-->
         <scene sceneID="v72-p2-sBG">
@@ -322,6 +321,81 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6rd-iZ-GZw" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="389" y="301"/>
+        </scene>
+        <!--Compose -->
+        <scene sceneID="pcS-g3-C5G">
+            <objects>
+                <viewController storyboardIdentifier="COMPOSE" title="User Time Line" useStoryboardIdentifierAsRestorationIdentifier="YES" id="5vA-92-4ct" userLabel="Compose " customClass="ComposeTweetViewController" customModule="TwitterClone" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="W8Z-yp-KxM"/>
+                        <viewControllerLayoutGuide type="bottom" id="Xdl-fW-WmV"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="62o-Iw-EDJ">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Compose Tweet" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T1w-o0-ITc">
+                                <rect key="frame" x="16" y="28" width="568" height="32"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="27"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MSy-Oi-1YH">
+                                <rect key="frame" x="36" y="100" width="528" height="128"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="128" id="Uvj-XC-lkS"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OO3-PC-AAZ">
+                                <rect key="frame" x="506" y="252" width="48" height="30"/>
+                                <state key="normal" title="Cancel">
+                                    <color key="titleColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="cancel:" destination="5vA-92-4ct" eventType="touchUpInside" id="qiV-Eq-mVO"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RlU-Ro-YkG">
+                                <rect key="frame" x="46" y="252" width="32" height="30"/>
+                                <state key="normal" title="Post">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="post:" destination="5vA-92-4ct" eventType="touchUpInside" id="9Vl-6j-XgZ"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="OO3-PC-AAZ" firstAttribute="top" secondItem="MSy-Oi-1YH" secondAttribute="bottom" constant="24" id="24r-Bt-NFM"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="T1w-o0-ITc" secondAttribute="trailing" id="Del-IE-Av1"/>
+                            <constraint firstItem="MSy-Oi-1YH" firstAttribute="top" secondItem="T1w-o0-ITc" secondAttribute="bottom" constant="40" id="Fpk-km-Gg7"/>
+                            <constraint firstItem="T1w-o0-ITc" firstAttribute="leading" secondItem="62o-Iw-EDJ" secondAttribute="leadingMargin" id="HqC-gp-b8E"/>
+                            <constraint firstItem="RlU-Ro-YkG" firstAttribute="top" secondItem="MSy-Oi-1YH" secondAttribute="bottom" constant="24" id="HuN-9J-PLr"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="OO3-PC-AAZ" secondAttribute="trailing" constant="30" id="Jzg-uO-W6V"/>
+                            <constraint firstItem="MSy-Oi-1YH" firstAttribute="leading" secondItem="62o-Iw-EDJ" secondAttribute="leadingMargin" constant="20" id="NGh-bx-Zcn"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="MSy-Oi-1YH" secondAttribute="trailing" constant="20" id="SdB-Zy-SMP"/>
+                            <constraint firstItem="T1w-o0-ITc" firstAttribute="top" secondItem="W8Z-yp-KxM" secondAttribute="bottom" constant="8" id="hvs-PW-Bnn"/>
+                            <constraint firstItem="T1w-o0-ITc" firstAttribute="trailing" secondItem="62o-Iw-EDJ" secondAttribute="trailingMargin" id="rFw-hH-omz"/>
+                            <constraint firstItem="RlU-Ro-YkG" firstAttribute="leading" secondItem="62o-Iw-EDJ" secondAttribute="leadingMargin" constant="30" id="xBB-6h-OhB"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="rFw-hH-omz"/>
+                            </mask>
+                        </variation>
+                    </view>
+                    <connections>
+                        <outlet property="textField" destination="MSy-Oi-1YH" id="o5H-Lk-aP8"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Lf3-Bv-pLy" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1845" y="958"/>
         </scene>
     </scenes>
     <resources>
