@@ -129,7 +129,6 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     return cell
   }
   
-  
   func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
     return 150
   }

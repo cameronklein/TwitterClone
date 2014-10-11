@@ -13,6 +13,7 @@ class ComposeTweetViewController: UIViewController {
   @IBOutlet weak var textField: UITextView!
   var networkController : NetworkController!
   
+  @IBOutlet weak var label: UILabel!
   //MARK - Lifecycle Methods
   
   override func viewDidLoad() {
@@ -32,9 +33,19 @@ class ComposeTweetViewController: UIViewController {
   }
   
   // MARK - Helper Methods
-  
-  @IBAction func cancel(sender: UIButton) {
-    self.dismissViewControllerAnimated(true, completion: nil)
+  @IBAction func sliderSlid(sender: UISlider) {
+    switch sender.value{
+    case 0...1:
+      label.text = "Not at all"
+    case 1...2:
+      label.text = "A little"
+    case 2...3:
+      label.text = "Somewhat"
+    case 3...4:
+      label.text = "Pretty profound"
+    default:
+      label.text = "Wow"
+    }
   }
   
   @IBAction func post(sender: UIButton) {
