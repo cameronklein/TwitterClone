@@ -68,7 +68,7 @@ class NetworkController {
               
               let backupPath = NSBundle.mainBundle().pathForResource("backup", ofType: "json")
               let backupData = NSData(contentsOfFile: backupPath!)
-              self.tweets = Tweet.parseJSONDataIntoTweets(data)!
+              self.tweets = Tweet.parseJSONDataIntoTweets(backupData)!
               
               completionHandler(errorDescription: httpResponse.statusCode.description, tweets: self.tweets)
               println("An error occured on Twitter's end.")

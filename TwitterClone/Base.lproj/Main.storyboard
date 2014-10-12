@@ -29,8 +29,8 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="hT4-cY-iJ5"/>
                                 </connections>
                             </tableView>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="bDk-cD-9NA">
-                                <rect key="frame" x="275" y="244" width="50" height="50"/>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="bDk-cD-9NA">
+                                <rect key="frame" x="275" y="251" width="50" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="Y5n-pa-y7e"/>
                                     <constraint firstAttribute="width" constant="50" id="e8C-J7-loe"/>
@@ -343,7 +343,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RlU-Ro-YkG">
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RlU-Ro-YkG">
                                 <rect key="frame" x="522" y="252" width="32" height="30"/>
                                 <state key="normal" title="Post">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -359,7 +359,7 @@
                                 </connections>
                             </slider>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="How profound is this tweet?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="l8s-vp-8aY">
-                                <rect key="frame" x="197" y="294" width="206" height="21"/>
+                                <rect key="frame" x="197" y="286" width="206" height="21"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
@@ -380,10 +380,11 @@
                             <constraint firstItem="MSy-Oi-1YH" firstAttribute="top" secondItem="T1w-o0-ITc" secondAttribute="bottom" constant="40" id="Fpk-km-Gg7"/>
                             <constraint firstAttribute="trailingMargin" secondItem="gf7-tk-sZo" secondAttribute="trailing" constant="30" id="G8U-Rl-LKU"/>
                             <constraint firstItem="T1w-o0-ITc" firstAttribute="leading" secondItem="62o-Iw-EDJ" secondAttribute="leadingMargin" id="HqC-gp-b8E"/>
-                            <constraint firstItem="RlU-Ro-YkG" firstAttribute="top" secondItem="MSy-Oi-1YH" secondAttribute="bottom" constant="24" id="HuN-9J-PLr"/>
+                            <constraint firstItem="RlU-Ro-YkG" firstAttribute="top" secondItem="MSy-Oi-1YH" secondAttribute="bottom" constant="16" id="HuN-9J-PLr"/>
                             <constraint firstItem="MSy-Oi-1YH" firstAttribute="leading" secondItem="62o-Iw-EDJ" secondAttribute="leadingMargin" constant="20" id="NGh-bx-Zcn"/>
                             <constraint firstItem="1vk-ah-YsK" firstAttribute="top" secondItem="gf7-tk-sZo" secondAttribute="bottom" constant="16" id="OA4-Vm-lX1"/>
                             <constraint firstAttribute="trailingMargin" secondItem="MSy-Oi-1YH" secondAttribute="trailing" constant="20" id="SdB-Zy-SMP"/>
+                            <constraint firstAttribute="centerX" secondItem="RlU-Ro-YkG" secondAttribute="centerX" id="TUy-Ge-Ooo"/>
                             <constraint firstItem="l8s-vp-8aY" firstAttribute="top" secondItem="RlU-Ro-YkG" secondAttribute="bottom" constant="12" id="VQF-Ej-mBf"/>
                             <constraint firstAttribute="centerX" secondItem="gf7-tk-sZo" secondAttribute="centerX" id="XgB-UT-FP8"/>
                             <constraint firstItem="gf7-tk-sZo" firstAttribute="leading" secondItem="62o-Iw-EDJ" secondAttribute="leadingMargin" constant="30" id="c5w-8H-v3p"/>
@@ -396,8 +397,10 @@
                         <variation key="default">
                             <mask key="constraints">
                                 <exclude reference="rFw-hH-omz"/>
-                                <exclude reference="xBB-6h-OhB"/>
+                                <exclude reference="XgB-UT-FP8"/>
                                 <exclude reference="nrQ-Tk-yMX"/>
+                                <exclude reference="nxf-CA-xX6"/>
+                                <exclude reference="xBB-6h-OhB"/>
                             </mask>
                         </variation>
                     </view>

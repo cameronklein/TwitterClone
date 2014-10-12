@@ -46,10 +46,16 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     self.networkController.fetchTweets (completionHandler: { (errorDescription, tweets) -> Void in
       if errorDescription != nil{
         NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
-          let alert = UIAlertController(title: "Oops!", message: errorDescription, preferredStyle: UIAlertControllerStyle.Alert)
+          let alert = UIAlertController(title: "Oops!", message: "Something went wrong. Loading backup tweets from bundle. (Error: \(errorDescription!))", preferredStyle: UIAlertControllerStyle.Alert)
           let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Cancel, handler: nil)
           alert.addAction(ok)
           self.presentViewController(alert, animated: true, completion: nil)
+          self.tweets = tweets
+          self.tableView.reloadData()
+          UIView.animateWithDuration(1.0, delay: 1.0, options: nil, animations: { () -> Void in
+            self.tableView.alpha = 1.0
+            self.spinningWheel.alpha = 0.0
+          }, completion: nil)
         })
       } else {
         NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
@@ -174,10 +180,12 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     networkController.fetchTweets(forUser: nil, sinceID: nil, maxID: tweets!.last!.id) { (errorDescription, tweets) -> (Void) in
       if errorDescription != nil{
         NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
-          let alert = UIAlertController(title: "Error \(errorDescription)", message: "Loading backup tweets from bundle instead.", preferredStyle: UIAlertControllerStyle.Alert)
+          let alert = UIAlertController(title: "Error \(errorDescription!)", message: "Loading backup tweets from bundle instead.", preferredStyle: UIAlertControllerStyle.Alert)
           let ok = UIAlertAction(title: "That's cool.", style: UIAlertActionStyle.Cancel, handler: nil)
           alert.addAction(ok)
           self.presentViewController(alert, animated: true, completion: nil)
+          self.tableView.reloadData()
+          self.isRefreshing = false
         })
       } else {
       for tweet in tweets! {

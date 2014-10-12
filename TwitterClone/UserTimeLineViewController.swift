@@ -56,9 +56,19 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     var didSetUsername = false
     
     if initialTweet == nil {
+      if let user = appDelegate.username {
+        username = user
+        didSetUsername = true
+      }
+      else {
+        
+        let alert = UIAlertController(title: "Oh no!", message: "Unable to identify you. Network error.", preferredStyle: UIAlertControllerStyle.Alert)
+        let ok = UIAlertAction(title: "That's cool.", style: UIAlertActionStyle.Cancel, handler: nil)
+        alert.addAction(ok)
+        self.presentViewController(alert, animated: true, completion: nil)
+
+      }
       
-      username = appDelegate.username!
-      didSetUsername = true
       
     } else {
       username = initialTweet.handle!
@@ -69,7 +79,7 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
       self.profileImage.layer.borderColor = UIColor.blackColor().CGColor
       self.profileImage.layer.borderWidth = 2
     }
-
+    if username != nil{
     networkController.fetchTweets(forUser: username!, completionHandler: { (errorDescription, tweets) -> (Void) in
       
       if errorDescription != nil{
@@ -110,6 +120,10 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
       })
       }
     })
+    } else {
+      spinningWheel.stopAnimating()
+      
+    }
     
     
     
