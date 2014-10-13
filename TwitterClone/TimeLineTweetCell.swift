@@ -17,7 +17,9 @@ class TimeLineTweetCell: UITableViewCell {
   @IBOutlet weak var topBarImage: UIImageView!
   @IBOutlet weak var favoriteLabel: UILabel!
   @IBOutlet weak var retweetLabel: UILabel!
+  @IBOutlet weak var media: UIImageView!
   @IBOutlet weak var labelConstraint: NSLayoutConstraint!
+  
   
   override func setSelected(selected: Bool, animated: Bool) {
     super.setSelected(selected, animated: animated)

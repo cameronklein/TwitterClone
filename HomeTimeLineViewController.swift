@@ -90,12 +90,18 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     let cell = tableView.dequeueReusableCellWithIdentifier("TWEET_CELL", forIndexPath: indexPath) as TimeLineTweetCell
     let tweet = self.tweets![indexPath.row]
     
+    cell.profileImage.image = nil
+    cell.topBarImage.image = nil
+    cell.media.image = nil
+    cell.labelConstraint.constant = 32
+    cell.media.hidden = false
+    
     cell.tweetTextLabel.text  = tweet.text
     cell.usernameLabel.text   = " " + tweet.username! + " "
     cell.dateLabel.text       = " " + tweet.readableDate + " "
     cell.retweetLabel.text    = String(tweet.retweetCount)
     cell.favoriteLabel.text   = String(tweet.favoriteCount)
-    
+
     cell.selectionStyle = UITableViewCellSelectionStyle.None
     
     func setUpBackgroundForLabel(label: UILabel){
@@ -113,23 +119,52 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     
     cell.profileImage.layer.borderColor = UIColor.blackColor().CGColor
     cell.profileImage.layer.borderWidth = 2
-
-    imageQueue.addOperationWithBlock { () -> Void in
-      if tweet.image == nil || tweet.bannerImage == nil {
-        self.networkController.fetchImagesForTweet(tweet, completionHandler: { (errorDescription, images) -> (Void) in
-          if tweet.image == nil {
-            tweet.image = images.0
-          }
-          if tweet.bannerImage == nil{
-            tweet.bannerImage = images.1
-          }
+    
+    if let thisProfile = tweet.image{
+      cell.profileImage.image = thisProfile
+    } else {
+      imageQueue.addOperationWithBlock({ () -> Void in
+        self.networkController.fetchImagesForTweet(tweet, forImage: ImageType.Profile, completionHandler: { (errorDescription, image) -> (Void) in
+          tweet.image = image
+          NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+            cell.profileImage.image = image
+          })
+        })
+      })
+    }
+    
+    if let thisBanner = tweet.bannerImage{
+      cell.topBarImage.image = thisBanner
+    } else {
+      imageQueue.addOperationWithBlock({ () -> Void in
+        self.networkController.fetchImagesForTweet(tweet, forImage: ImageType.Banner, completionHandler: { (errorDescription, image) -> (Void) in
+          tweet.bannerImage = image
+          NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+            cell.topBarImage.image = image
+          })
+        })
+      })
+    }
+    
+    if tweet.mediaString == nil{
+      cell.media.hidden = true
+      cell.layoutSubviews()
+      
+    } else {
+      cell.labelConstraint.constant = 232
+      if let thisMedia = tweet.mediaImage{
+        cell.media.image = thisMedia
+      } else {
+        imageQueue.addOperationWithBlock({ () -> Void in
+          self.networkController.fetchImagesForTweet(tweet, forImage: ImageType.Media, completionHandler: { (errorDescription, image) -> (Void) in
+            tweet.mediaImage = image
+            NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+              
+              cell.media.image = image
+            })
+          })
         })
       }
-      
-      NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
-        cell.profileImage.image = tweet.image
-        cell.topBarImage.image = tweet.bannerImage
-      })
     }
     
     return cell
@@ -138,6 +173,7 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
   func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
     return 150
   }
+  
   
   // MARK: - UITableViewDelegate
   
@@ -177,7 +213,7 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
 
     if self.isRefreshing == false{
       self.isRefreshing == true
-    networkController.fetchTweets(forUser: nil, sinceID: nil, maxID: tweets!.last!.id) { (errorDescription, tweets) -> (Void) in
+      networkController.fetchTweets(forUser: nil, sinceID: nil, maxID: tweets!.last!.id) { (errorDescription, tweets) -> (Void) in
       if errorDescription != nil{
         NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
           let alert = UIAlertController(title: "Error \(errorDescription!)", message: "Loading backup tweets from bundle instead.", preferredStyle: UIAlertControllerStyle.Alert)

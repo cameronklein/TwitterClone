@@ -105,8 +105,8 @@
                                     <constraint firstAttribute="height" constant="100" id="Dei-zz-pdw"/>
                                 </constraints>
                             </imageView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p0j-gm-9c6">
-                                <rect key="frame" x="16" y="16" width="198" height="198"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="p0j-gm-9c6">
+                                <rect key="frame" x="16" y="80" width="198" height="198"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="p0j-gm-9c6" secondAttribute="height" multiplier="1:1" id="MOj-dy-Yey"/>
                                 </constraints>

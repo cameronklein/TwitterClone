@@ -15,8 +15,10 @@ class Tweet {
   var username            : String?
   var handle              : String?
   var profileString       : String?
+  var mediaString         : String?
   var image               : UIImage?
   var bannerImage         : UIImage?
+  var mediaImage          : UIImage?
   var timestamp           : NSDate
   var favoriteCount       : Int
   var retweetCount        : Int
@@ -43,6 +45,18 @@ class Tweet {
       self.handle         = userDictionary["screen_name"]       as String?
       if let bannerURL    = userDictionary["profile_banner_url"]   as? String{
         self.bannerString = bannerURL
+      }
+    }
+    if let entitiesDict   = tweetDictionary["entities"]         as? NSDictionary {
+      println("Found Entities")
+      if let mediaArray    = entitiesDict["media"]              as? NSArray {
+        if let mediaDict    = mediaArray[0]                     as? NSDictionary {
+          println("Found Media")
+          if let mediaURL   = mediaDict["media_url_https"]        as String? {
+            self.mediaString  = mediaURL
+            println(mediaURL)
+          }
+        }
       }
     }
     let formatter = NSDateFormatter()

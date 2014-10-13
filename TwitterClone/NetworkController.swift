@@ -30,10 +30,14 @@ class NetworkController {
         
         let accounts = accountStore.accountsWithAccountType(accountType)
         self.twitterAccount = (accounts.first as ACAccount)
+        if self.authenticatedUserScreenName == nil {
+          self.authenticatedUserScreenName = self.twitterAccount?.username
+        }
         var twitterRequest : SLRequest!
         var paramDictionary = [NSObject : AnyObject]()
         var url : NSURL!
         
+        paramDictionary["screen_name"] = self.authenticatedUserScreenName!
         paramDictionary["count"] = "100"
         if let screenname = handle{
           paramDictionary["screen_name"] = screenname
@@ -174,11 +178,13 @@ class NetworkController {
     }
   }
   
-  func fetchImagesForTweet(tweet: Tweet, completionHandler : (errorDescription: String?, images: (UIImage?, UIImage?)) -> (Void)) {
+  func fetchImagesForTweet(tweet: Tweet, completionHandler : (errorDescription: String?, images: (UIImage?, UIImage?, UIImage?)) -> (Void)) {
     var avatarImage : UIImage?
     var bannerImage : UIImage?
+    var mediaImage  : UIImage?
     let bannerString = tweet.bannerString!
     let profileString = tweet.profileString!
+    let mediaString = tweet.mediaString
     let avatarKey = "\(tweet.handle!)_Avatar"
     let bannerKey = "\(tweet.handle!)_Banner"
     
@@ -210,9 +216,7 @@ class NetworkController {
           let backupURL = NSURL(string: "http://img4.wikia.nocookie.net/__cb20140603164657/p__/protagonist/images/b/b0/Blue-energy.jpg")
           let backupData = NSData(contentsOfURL: backupURL)
           bannerImage = UIImage(data: backupData)
-        }
-        
-        cache[bannerKey] = bannerImage
+          cache[bannerKey] = bannerImage
   
       } else {
         println(bannerKey)
@@ -220,9 +224,72 @@ class NetworkController {
         println("Banner from cache!")
       }
     }
-    return completionHandler(errorDescription: nil, images: (avatarImage, bannerImage))
+    
+    if let thisMediaString = mediaString {
+      let imageURL = NSURL(string: thisMediaString)
+      let data = NSData(contentsOfURL: imageURL)
+      mediaImage = UIImage(data: data)
+    }
+    completionHandler(errorDescription: nil, images: (avatarImage, bannerImage, mediaImage))
+  }
   }
   
+  func fetchImagesForTweet(tweet: Tweet, forImage: ImageType, completionHandler : (errorDescription: String?, image: UIImage?) -> (Void)) {
+    
+    switch forImage{
+    case ImageType.Profile:
+      var avatarImage : UIImage?
+      let avatarKey = "\(tweet.handle!)_Avatar"
+      let profileString = tweet.profileString!
+      if cache[avatarKey] == nil {
+        
+        let normalRange = profileString.rangeOfString("_normal", options: nil, range: nil, locale: nil)
+        let newString = profileString.stringByReplacingCharactersInRange(normalRange!, withString: "_bigger")
+        let imageURL = NSURL(string: newString)
+        let data = NSData(contentsOfURL: imageURL)
+        avatarImage = UIImage(data: data)
+        
+        cache[avatarKey] = avatarImage
+        
+      } else {
+        avatarImage = cache[avatarKey]
+        println("Avatar from cache!")
+      }
+      completionHandler(errorDescription: nil, image: avatarImage)
+      
+    case ImageType.Banner:
+      var bannerImage : UIImage?
+      let bannerKey = "\(tweet.handle!)_Banner"
+      let bannerString = tweet.bannerString!
+      if cache[bannerKey] == nil {
+        
+        let imageURL = NSURL(string: bannerString)
+        let data = NSData(contentsOfURL: imageURL)
+        bannerImage = UIImage(data: data)
+        
+        cache[bannerKey] = bannerImage
+        
+      } else {
+        bannerImage = cache[bannerKey]
+        println("Avatar from cache!")
+      }
+      completionHandler(errorDescription: nil, image: bannerImage)
+      
+    case ImageType.Media:
+      var mediaImage : UIImage?
+      var mediaString = tweet.mediaString
 
+      let imageURL = NSURL(string: mediaString!)
+      let data = NSData(contentsOfURL: imageURL)
+      mediaImage = UIImage(data: data)
   
+      completionHandler(errorDescription: nil, image: mediaImage)
+    }
+  }
+}
+
+
+
+enum ImageType {
+  case Profile, Banner, Media
 }

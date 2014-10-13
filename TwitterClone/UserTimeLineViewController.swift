@@ -35,9 +35,7 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     self.networkController = appDelegate.networkController
     
     var username : String? = nil
-    
-    
-    
+  
     
     /* SETUP TABLEVIEW STUFF */
     
@@ -49,14 +47,14 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     self.tableView.alpha = 0.0
     
     self.tableView.rowHeight = UITableViewAutomaticDimension
-    self.tableView.estimatedRowHeight = 150.0
+    self.tableView.estimatedRowHeight = 50.0
     
     self.tableView.registerNib(UINib(nibName: "TimeLineTweetCell", bundle: NSBundle.mainBundle()), forCellReuseIdentifier: "TWEET_CELL")
 
     var didSetUsername = false
     
     if initialTweet == nil {
-      if let user = appDelegate.username {
+      if let user = networkController.authenticatedUserScreenName {
         username = user
         didSetUsername = true
       }
@@ -171,10 +169,10 @@ class UserTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     cell.favoriteLabel.text   = String(tweet.favoriteCount)
     cell.selectionStyle = UITableViewCellSelectionStyle.None
     
-    cell.topBarImage.removeFromSuperview()
-    cell.usernameLabel.removeFromSuperview()
-    cell.imageView?.removeFromSuperview()
-    cell.labelConstraint.constant = -60
+    cell.topBarImage.hidden = true
+    cell.usernameLabel.hidden = true
+    cell.imageView?.hidden = true
+    cell.labelConstraint.constant = -40
     
     return cell
     

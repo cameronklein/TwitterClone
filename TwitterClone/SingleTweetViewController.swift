@@ -96,7 +96,7 @@ class SingleTweetViewController: UIViewController {
   
   // MARK: - Helper Methods
   
-  func tapCaptured(sender: UILongPressGestureRecognizer){
+  func tapCaptured(sender: UITapGestureRecognizer){
     if sender.state == UIGestureRecognizerState.Ended {
       let userVC = self.storyboard?.instantiateViewControllerWithIdentifier("USER_TIMELINE") as UserTimeLineViewController
       userVC.initialTweet = tweet

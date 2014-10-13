@@ -7,14 +7,20 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="TWEET_CELL" rowHeight="347" id="YCP-Za-qVY" customClass="TimeLineTweetCell" customModule="TwitterClone" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="600" height="347"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="TWEET_CELL" rowHeight="529" id="YCP-Za-qVY" customClass="TimeLineTweetCell" customModule="TwitterClone" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="529"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="YCP-Za-qVY" id="5RT-jp-nNu">
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="puN-6c-xEx">
+                        <rect key="frame" x="20" y="76" width="560" height="200"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="200" id="iHV-Jd-Zdh"/>
+                        </constraints>
+                    </imageView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CfU-Hs-V4n" userLabel="Bottom Bar View">
-                        <rect key="frame" x="8" y="318" width="592" height="20"/>
+                        <rect key="frame" x="8" y="500" width="592" height="20"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fsL-hh-dQ8" userLabel="Retweet View">
                                 <rect key="frame" x="171" y="0.0" width="100" height="20"/>
@@ -86,7 +92,7 @@
                             <constraint firstAttribute="height" constant="70" id="0Gd-Nh-rI0"/>
                         </constraints>
                     </imageView>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7V0-qr-lsl">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7V0-qr-lsl" userLabel="Profile">
                         <rect key="frame" x="20" y="12" width="75" height="75"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="75" id="JCY-Jh-32Y"/>
@@ -100,7 +106,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="wordWrap" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7w9-fw-ccC" userLabel="TweetLabel">
-                        <rect key="frame" x="20" y="99" width="560" height="203"/>
+                        <rect key="frame" x="20" y="292" width="560" height="192"/>
                         <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="14"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
@@ -114,6 +120,7 @@
                 </subviews>
                 <constraints>
                     <constraint firstItem="CfU-Hs-V4n" firstAttribute="leading" secondItem="7V0-qr-lsl" secondAttribute="trailing" id="29c-Td-CSK"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="puN-6c-xEx" secondAttribute="trailing" constant="12" id="2EZ-8N-P0h"/>
                     <constraint firstAttribute="trailing" secondItem="CfU-Hs-V4n" secondAttribute="trailing" id="4i5-fF-Qjh"/>
                     <constraint firstAttribute="trailingMargin" secondItem="7w9-fw-ccC" secondAttribute="trailing" constant="12" id="6uH-WR-skW"/>
                     <constraint firstItem="brB-Kt-odT" firstAttribute="trailing" secondItem="5RT-jp-nNu" secondAttribute="trailingMargin" id="87s-QK-PKI"/>
@@ -128,28 +135,32 @@
                     <constraint firstItem="7V0-qr-lsl" firstAttribute="top" secondItem="5RT-jp-nNu" secondAttribute="topMargin" constant="4" id="Mg6-hq-wfJ"/>
                     <constraint firstItem="brB-Kt-odT" firstAttribute="top" secondItem="5RT-jp-nNu" secondAttribute="topMargin" id="OdE-YH-6rE"/>
                     <constraint firstItem="KJB-7s-5j3" firstAttribute="top" secondItem="brB-Kt-odT" secondAttribute="top" id="PYt-bZ-W0b"/>
+                    <constraint firstItem="puN-6c-xEx" firstAttribute="leading" secondItem="5RT-jp-nNu" secondAttribute="leadingMargin" constant="12" id="RQx-YE-tMN"/>
+                    <constraint firstItem="puN-6c-xEx" firstAttribute="top" secondItem="YPY-Uv-UMN" secondAttribute="bottom" constant="8" id="T4m-uD-RKa"/>
                     <constraint firstAttribute="trailingMargin" secondItem="KJB-7s-5j3" secondAttribute="trailing" id="Thn-uL-bfE"/>
-                    <constraint firstItem="7w9-fw-ccC" firstAttribute="top" secondItem="7V0-qr-lsl" secondAttribute="bottom" constant="12" id="Tse-fZ-mla"/>
                     <constraint firstItem="brB-Kt-odT" firstAttribute="trailing" secondItem="5RT-jp-nNu" secondAttribute="trailingMargin" id="W9B-dQ-5ZI"/>
                     <constraint firstItem="brB-Kt-odT" firstAttribute="leading" secondItem="7V0-qr-lsl" secondAttribute="trailing" constant="8" id="auE-L8-0jQ"/>
                     <constraint firstItem="KJB-7s-5j3" firstAttribute="top" secondItem="5RT-jp-nNu" secondAttribute="topMargin" constant="4" id="ggW-wp-BGP"/>
+                    <constraint firstItem="7w9-fw-ccC" firstAttribute="top" secondItem="puN-6c-xEx" secondAttribute="bottom" constant="16" id="k9X-Ih-u5R"/>
                     <constraint firstItem="7V0-qr-lsl" firstAttribute="leading" secondItem="5RT-jp-nNu" secondAttribute="leadingMargin" constant="12" id="lMw-tb-VCa"/>
                     <constraint firstAttribute="bottomMargin" secondItem="brB-Kt-odT" secondAttribute="bottom" id="lhL-cV-Gek"/>
                     <constraint firstAttribute="bottomMargin" secondItem="7w9-fw-ccC" secondAttribute="bottom" constant="12" id="oOp-pv-HfR"/>
                     <constraint firstItem="KJB-7s-5j3" firstAttribute="leading" secondItem="7V0-qr-lsl" secondAttribute="trailing" constant="-19" id="pA7-rc-MYU"/>
                     <constraint firstItem="YPY-Uv-UMN" firstAttribute="top" secondItem="5RT-jp-nNu" secondAttribute="topMargin" constant="-10" id="qpZ-RY-02q"/>
                     <constraint firstItem="YPY-Uv-UMN" firstAttribute="leading" secondItem="5RT-jp-nNu" secondAttribute="leadingMargin" constant="-8" id="rhM-6e-TWV"/>
+                    <constraint firstItem="7w9-fw-ccC" firstAttribute="top" secondItem="YPY-Uv-UMN" secondAttribute="bottom" constant="224" id="t6z-Ag-7OQ"/>
                     <constraint firstItem="brB-Kt-odT" firstAttribute="top" secondItem="KJB-7s-5j3" secondAttribute="bottom" id="tNI-2g-7xz"/>
                     <constraint firstItem="7w9-fw-ccC" firstAttribute="leading" secondItem="5RT-jp-nNu" secondAttribute="leadingMargin" constant="12" id="xpm-g7-Hso"/>
                 </constraints>
                 <variation key="default">
                     <mask key="constraints">
-                        <exclude reference="oOp-pv-HfR"/>
                         <exclude reference="LFN-uA-JGm"/>
                         <exclude reference="PYt-bZ-W0b"/>
                         <exclude reference="Thn-uL-bfE"/>
                         <exclude reference="ggW-wp-BGP"/>
                         <exclude reference="pA7-rc-MYU"/>
+                        <exclude reference="k9X-Ih-u5R"/>
+                        <exclude reference="oOp-pv-HfR"/>
                         <exclude reference="29c-Td-CSK"/>
                         <exclude reference="87s-QK-PKI"/>
                         <exclude reference="KHC-u2-ojR"/>
@@ -163,14 +174,15 @@
                 <outlet property="contentView" destination="5RT-jp-nNu" id="OuT-9j-z2j"/>
                 <outlet property="dateLabel" destination="brB-Kt-odT" id="IVn-fO-vZm"/>
                 <outlet property="favoriteLabel" destination="EEk-Ae-5D7" id="fc0-7h-cd3"/>
-                <outlet property="labelConstraint" destination="Tse-fZ-mla" id="VmR-jG-8OE"/>
+                <outlet property="labelConstraint" destination="t6z-Ag-7OQ" id="ehU-yv-JjF"/>
+                <outlet property="media" destination="puN-6c-xEx" id="Rcv-gB-DBI"/>
                 <outlet property="profileImage" destination="7V0-qr-lsl" id="you-6R-pmU"/>
                 <outlet property="retweetLabel" destination="waY-DC-bK5" id="eh6-eI-36a"/>
                 <outlet property="topBarImage" destination="YPY-Uv-UMN" id="YNe-zH-eZc"/>
                 <outlet property="tweetTextLabel" destination="7w9-fw-ccC" id="Teb-Lr-6uj"/>
                 <outlet property="usernameLabel" destination="KJB-7s-5j3" id="Omz-uv-KgS"/>
             </connections>
-            <point key="canvasLocation" x="446" y="869.5"/>
+            <point key="canvasLocation" x="446" y="956.5"/>
         </tableViewCell>
     </objects>
     <resources>

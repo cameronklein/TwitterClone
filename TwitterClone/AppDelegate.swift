@@ -17,12 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var username : String? = nil
 
 
-  func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-    
-    networkController.fetchCurrentUser { (errorDescription, screenname) -> (Void) in
-      self.username = screenname
-    }
-    
+  func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool{
     
     return true
   }
