@@ -42,32 +42,11 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     /* GET DATA */
     
     appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
+    appDelegate.homeTimeLine = self
+    
     self.networkController = appDelegate.networkController
-    self.networkController.fetchTweets (completionHandler: { (errorDescription, tweets) -> Void in
-      if errorDescription != nil{
-        NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
-          let alert = UIAlertController(title: "Oops!", message: "Something went wrong. Loading backup tweets from bundle. (Error: \(errorDescription!))", preferredStyle: UIAlertControllerStyle.Alert)
-          let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Cancel, handler: nil)
-          alert.addAction(ok)
-          self.presentViewController(alert, animated: true, completion: nil)
-          self.tweets = tweets
-          self.tableView.reloadData()
-          UIView.animateWithDuration(1.0, delay: 1.0, options: nil, animations: { () -> Void in
-            self.tableView.alpha = 1.0
-            self.spinningWheel.alpha = 0.0
-          }, completion: nil)
-        })
-      } else {
-        NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
-          self.tweets = tweets
-          self.tableView.reloadData()
-          UIView.animateWithDuration(1.0, delay: 1.0, options: nil, animations: { () -> Void in
-            self.tableView.alpha = 1.0
-            self.spinningWheel.alpha = 0.0
-          }, completion: nil)
-        })
-      }
-    })
+
+    self.reloadAllTweets()
   }
   
   override func didReceiveMemoryWarning() {
@@ -235,6 +214,34 @@ class HomeTimeLineViewController: UIViewController, UITableViewDataSource, UITab
     }
     }
   }
+  }
+  
+  func reloadAllTweets(){
+    self.networkController.fetchTweets (completionHandler: { (errorDescription, tweets) -> Void in
+      if errorDescription != nil{
+        NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+          let alert = UIAlertController(title: "Oops!", message: "Something went wrong. Loading backup tweets from bundle. (Error: \(errorDescription!))", preferredStyle: UIAlertControllerStyle.Alert)
+          let ok = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Cancel, handler: nil)
+          alert.addAction(ok)
+          self.presentViewController(alert, animated: true, completion: nil)
+          self.tweets = tweets
+          self.tableView.reloadData()
+          UIView.animateWithDuration(1.0, delay: 1.0, options: nil, animations: { () -> Void in
+            self.tableView.alpha = 1.0
+            self.spinningWheel.alpha = 0.0
+            }, completion: nil)
+        })
+      } else {
+        NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+          self.tweets = tweets
+          self.tableView.reloadData()
+          UIView.animateWithDuration(1.0, delay: 1.0, options: nil, animations: { () -> Void in
+            self.tableView.alpha = 1.0
+            self.spinningWheel.alpha = 0.0
+            }, completion: nil)
+        })
+      }
+    })
   }
   
 }

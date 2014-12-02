@@ -72,7 +72,7 @@ class NetworkController {
               
               let backupPath = NSBundle.mainBundle().pathForResource("backup", ofType: "json")
               let backupData = NSData(contentsOfFile: backupPath!)
-              self.tweets = Tweet.parseJSONDataIntoTweets(backupData)!
+              self.tweets = Tweet.parseJSONDataIntoTweets(backupData!)!
               
               completionHandler(errorDescription: httpResponse.statusCode.description, tweets: self.tweets)
               println("An error occured on Twitter's end.")
@@ -194,8 +194,8 @@ class NetworkController {
         let normalRange = profileString.rangeOfString("_normal", options: nil, range: nil, locale: nil)
         let newString = profileString.stringByReplacingCharactersInRange(normalRange!, withString: "_bigger")
         let imageURL = NSURL(string: newString)
-        let data = NSData(contentsOfURL: imageURL)
-        avatarImage = UIImage(data: data)
+        let data = NSData(contentsOfURL: imageURL!)
+        avatarImage = UIImage(data: data!)
         
         cache[avatarKey] = avatarImage
     
@@ -209,13 +209,13 @@ class NetworkController {
       if cache[bannerKey] == nil {
       
         let imageURL = NSURL(string: bannerString)
-        let data = NSData(contentsOfURL: imageURL)
-        bannerImage = UIImage(data: data)
+        let data = NSData(contentsOfURL: imageURL!)
+        bannerImage = UIImage(data: data!)
         
         if bannerImage == nil {
           let backupURL = NSURL(string: "http://img4.wikia.nocookie.net/__cb20140603164657/p__/protagonist/images/b/b0/Blue-energy.jpg")
-          let backupData = NSData(contentsOfURL: backupURL)
-          bannerImage = UIImage(data: backupData)
+          let backupData = NSData(contentsOfURL: backupURL!)
+          bannerImage = UIImage(data: backupData!)
           cache[bannerKey] = bannerImage
   
       } else {
@@ -227,8 +227,8 @@ class NetworkController {
     
     if let thisMediaString = mediaString {
       let imageURL = NSURL(string: thisMediaString)
-      let data = NSData(contentsOfURL: imageURL)
-      mediaImage = UIImage(data: data)
+      let data = NSData(contentsOfURL: imageURL!)
+      mediaImage = UIImage(data: data!)
     }
     completionHandler(errorDescription: nil, images: (avatarImage, bannerImage, mediaImage))
   }
@@ -246,8 +246,8 @@ class NetworkController {
         let normalRange = profileString.rangeOfString("_normal", options: nil, range: nil, locale: nil)
         let newString = profileString.stringByReplacingCharactersInRange(normalRange!, withString: "_bigger")
         let imageURL = NSURL(string: newString)
-        let data = NSData(contentsOfURL: imageURL)
-        avatarImage = UIImage(data: data)
+        let data = NSData(contentsOfURL: imageURL!)
+        avatarImage = UIImage(data: data!)
         
         cache[avatarKey] = avatarImage
         
@@ -264,8 +264,8 @@ class NetworkController {
       if cache[bannerKey] == nil {
         
         let imageURL = NSURL(string: bannerString)
-        let data = NSData(contentsOfURL: imageURL)
-        bannerImage = UIImage(data: data)
+        let data = NSData(contentsOfURL: imageURL!)
+        bannerImage = UIImage(data: data!)
         
         cache[bannerKey] = bannerImage
         
@@ -280,8 +280,8 @@ class NetworkController {
       var mediaString = tweet.mediaString
 
       let imageURL = NSURL(string: mediaString!)
-      let data = NSData(contentsOfURL: imageURL)
-      mediaImage = UIImage(data: data)
+      let data = NSData(contentsOfURL: imageURL!)
+      mediaImage = UIImage(data: data!)
   
       completionHandler(errorDescription: nil, image: mediaImage)
     }

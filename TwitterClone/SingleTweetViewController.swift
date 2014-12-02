@@ -54,11 +54,13 @@ class SingleTweetViewController: UIViewController {
     retweetLabel.text       = String(tweet.retweetCount)
     favoriteLabel.text      = String(tweet.favoriteCount)
     
-    let tapRecognizer = UITapGestureRecognizer(target: self, action: "tapCaptured:")
+    let tapRecognizer = UITapGestureRecognizer()
+    tapRecognizer.addTarget(self, action: "tapCaptured:")
     profileImage.addGestureRecognizer(tapRecognizer)
     profileImage.userInteractionEnabled = true
     
-    let otherTapRecognizer = UITapGestureRecognizer(target: self, action: "tapCaptured:")
+    let otherTapRecognizer = UITapGestureRecognizer()
+    otherTapRecognizer.addTarget(self, action: "tapCaptured:")
     profileLabel.addGestureRecognizer(otherTapRecognizer)
     profileLabel.userInteractionEnabled = true
     
@@ -96,7 +98,7 @@ class SingleTweetViewController: UIViewController {
   
   // MARK: - Helper Methods
   
-  func tapCaptured(sender: UITapGestureRecognizer){
+  func tapCaptured(sender: UILongPressGestureRecognizer){
     if sender.state == UIGestureRecognizerState.Ended {
       let userVC = self.storyboard?.instantiateViewControllerWithIdentifier("USER_TIMELINE") as UserTimeLineViewController
       userVC.initialTweet = tweet
